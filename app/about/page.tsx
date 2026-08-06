@@ -18,11 +18,11 @@ export async function generateMetadata(): Promise<Metadata> {
 const scienceSections = [
   {
     names: 'Mindfulness and Meditation Practice',
-    body: "Mark's meditation training gave him a systematic way to work with attention, emotion, awareness, and the moment-to-moment experience of the mind.",
+    body: "Mark's meditation training gave him a systematic way to work with attention, emotion, awareness, and moment-to-moment experience.",
   },
   {
     names: 'Shadow and Relational Work',
-    body: 'Shadow integration and relational development help reveal the hidden adaptations, projections, wounds, and protective strategies that shape how people react and relate.',
+    body: 'Shadow integration and relational development help reveal hidden adaptations, projections, wounds, and protective strategies that shape how people react and relate.',
   },
   {
     names: 'Development and Perspective-Taking',
@@ -118,7 +118,7 @@ export default async function AboutPage() {
             margin: '0 auto 2rem',
           }}>
             Dr. Mark Pirtle is the creator of SkillfullyAware®, author of{' '}
-            <em>Built This Way: Why Painful Patterns Repeat and How to Change Them</em>, and creator of the SkillfullyAware Awareness Quotient (SAAQ).
+            <em>Built This Way: Why Painful Patterns Repeat and How to Change Them</em>, and creator of the SkillfullyAware Awareness Quotient, or SAAQ.
           </p>
           <p style={{
             fontSize: 'clamp(1rem, 1.6vw, 1.15rem)',
@@ -127,7 +127,7 @@ export default async function AboutPage() {
             maxWidth: '52ch',
             margin: '0 auto 2.5rem',
           }}>
-            His work helps people understand why painful patterns repeat, how those patterns shape life and work, and how awareness, practice, integration, and compassion make change possible.
+            His work helps people understand why painful patterns repeat, how those patterns shape life, relationships, and leadership, and how awareness, practice, integration, and compassion make change possible.
           </p>
           <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
             <Link
@@ -176,13 +176,13 @@ export default async function AboutPage() {
         </h2>
 
         <p style={{ marginBottom: '1.25rem', lineHeight: 1.8, color: 'var(--color-brand-text)' }}>
-          Dr. Pirtle's work did not begin as a brand strategy or business model. It began when a professional crisis exposed how much identity, stress, and old protective patterns were quietly running his life.
+          Mark's work did not begin as a brand strategy or a business model. It began when a professional crisis exposed how much identity, stress, anger, and old protective patterns were running his life.
         </p>
         <p style={{ marginBottom: '1.25rem', lineHeight: 1.8 }}>
-          Early in his career, Mark was a successful physical therapist and entrepreneur. Then a loophole in an operating agreement cost him his business, his title, and his professional identity. The fallout was not only financial or professional. It triggered a cascade of stress-related symptoms that forced him to look more honestly at the patterns shaping his mind, body, relationships, and sense of self.
+          Early in his career, Mark was a successful physical therapist and entrepreneur. Then a loophole in an operating agreement cost him his business, title, income, professional identity, and much of what he thought made him secure. The fallout was not only financial or professional. It affected his body, his relationships, his sleep, and his sense of self.
         </p>
         <p style={{ marginBottom: '1.25rem', lineHeight: 1.8 }}>
-          During a two-month retreat at a Tibetan Buddhist monastery, Mark immersed himself in meditation, silence, and sustained self-reflection. What he discovered there became the foundation for the work that followed: painful patterns can be seen, understood, practiced with, and changed.
+          During a two-month retreat at a Tibetan Buddhist monastery, Mark immersed himself in meditation, silence, and sustained self-reflection. He began to see that painful patterns could be observed, understood, practiced with, and changed.
         </p>
 
         <blockquote style={{
@@ -197,11 +197,8 @@ export default async function AboutPage() {
           "That retreat taught me something I still teach today: awareness is not an idea. It is a practice."
         </blockquote>
 
-        <p style={{ marginBottom: '1.25rem', lineHeight: 1.8 }}>
-          After returning to the United States, Mark launched a mindfulness-based pain program for a nationally recognized rehabilitation center and began developing SkillfullyAware®, a practical system that integrates awareness training, perspective-taking, shadow integration, nervous system regulation, and embodied practice.
-        </p>
         <p style={{ marginBottom: '2rem', lineHeight: 1.8 }}>
-          Today, his work includes <em>Built This Way</em>, the SAAQ, Power Tools, coaching, retreats, leadership experiences, and the PBS documentary <em>Is Your Story Making You Sick?</em> Each doorway serves the same larger purpose: helping people understand their patterns, work through them, and continue evolving throughout life.
+          Today, his work includes <em>Built This Way</em>, the SAAQ, Power Tools, coaching, forum retreats, leadership experiences, and the PBS documentary <em>Is Your Story Making You Sick?</em> Each doorway serves the same purpose: helping people understand their patterns, work with them, and continue evolving throughout life.
         </p>
 
         <Link
@@ -227,11 +224,11 @@ export default async function AboutPage() {
           A Practical System for Understanding and Changing Patterns
         </h2>
         <p style={{ marginBottom: '1.25rem', lineHeight: 1.8, color: 'var(--color-brand-text-muted)' }}>
-          SkillfullyAware® helps people see the patterns shaping how they react, relate, decide, protect themselves, and grow.
+          SkillfullyAware® is a practical system for understanding and changing painful patterns. It helps people see what is happening, understand how the pattern was built, and practice responding with more awareness and care.
         </p>
         <p style={{ marginBottom: '2.5rem', lineHeight: 1.8 }}>
-          If you are here to understand your own painful patterns, the work often begins with the book,{' '}
-          <em>Built This Way: Why Painful Patterns Repeat and How to Change Them</em>. If you are here for leadership, forums, retreats, or coaching, the work may begin with the SAAQ, coaching, or a forum retreat.
+          If you are here to understand your own painful patterns, the work often begins with{' '}
+          <em>Built This Way</em> and the reader tools. If you are here for leadership, forums, retreats, or coaching, the work may begin with the SAAQ, coaching, or a forum retreat.
           <br /><br />
           Different starting points. One integrated system.
         </p>
@@ -241,18 +238,18 @@ export default async function AboutPage() {
           {[
             {
               title: 'Seeing Yourself',
-              label: 'Meditation and Mindfulness',
-              body: 'These practices strengthen attention, emotional regulation, and present-moment awareness so you can see what is happening inside you before old patterns take over.',
+              label: 'Awareness and Mindfulness',
+              body: 'These practices strengthen attention, emotional regulation, and present-moment awareness so you can see what is happening before old patterns take over.',
             },
             {
               title: 'Understanding Yourself',
               label: 'Shadow and Unfinished Business',
-              body: 'Shadow work brings hidden or disowned patterns into conscious view. What was once driving reactivity from the background can become something you understand and work with more skillfully.',
+              body: 'Shadow work brings hidden or disowned patterns into conscious view. What once drove reactivity from the background can become something you understand and work with more skillfully.',
             },
             {
               title: 'Evolving Yourself',
               label: 'Perspective and Development',
-              body: 'Perspective-taking helps you see through more than one lens, understand your own blind spots, and respond with greater maturity, flexibility, and compassion.',
+              body: 'Perspective-taking helps you see through more than one lens, understand blind spots, and respond with greater maturity, flexibility, and compassion.',
             },
           ].map(p => (
             <div key={p.title} style={{
@@ -294,7 +291,7 @@ export default async function AboutPage() {
         </div>
 
         <p style={{ lineHeight: 1.8, color: 'var(--color-brand-text-muted)', marginBottom: '2rem' }}>
-          The World-Body-Mind model helps people understand how experience is shaped by outer circumstances, inner stories, nervous system patterns, relationships, attention, and meaning-making. When these dimensions become more integrated, people can respond to life with greater clarity, connection, and resilience.
+          The World-Body-Mind model helps people understand how experience is shaped by outer circumstances, inner stories, nervous system patterns, relationships, attention, and meaning-making. When these dimensions become more integrated, people can respond with greater clarity, connection, and resilience.
         </p>
 
         <Link
@@ -320,26 +317,14 @@ export default async function AboutPage() {
           Grounded in Practice, Informed by Science
         </h2>
         <p style={{ marginBottom: '1.25rem', lineHeight: 1.8, color: 'var(--color-brand-text-muted)' }}>
-          SkillfullyAware® is practical first. The point is not theory for its own sake. The point is helping people understand the patterns shaping their lives and practice living them differently.
+          SkillfullyAware® is practical first. The point is helping people understand the patterns shaping their lives and practice living them differently.
         </p>
-        <p style={{ marginBottom: '1.5rem', lineHeight: 1.8, color: 'var(--color-brand-text-muted)' }}>
-          The work integrates mindfulness, neuroscience, developmental psychology, attachment and relational development, systems thinking, Buddhist psychology, CBT, Socratic inquiry, and decades of direct experience with clients, leaders, retreats, and practice communities.
+        <p style={{ marginBottom: '2.5rem', lineHeight: 1.8, color: 'var(--color-brand-text-muted)' }}>
+          The work is informed by mindfulness, adult development, shadow and relational work, systems thinking, Buddhist psychology, CBT, Socratic inquiry, and decades of direct work with clients, leaders, retreats, and practice communities.
         </p>
 
-        {/* Pill tags */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '3rem' }}>
-          {['Mindfulness', 'Neuroscience', 'Developmental Psychology', 'Attachment & Relational Development', 'Systems Thinking', 'Buddhist Psychology', 'CBT', 'Socratic Inquiry'].map(tag => (
-            <span key={tag} style={{
-              padding: '0.35rem 0.9rem',
-              borderRadius: '9999px',
-              border: '1px solid var(--color-brand-border)',
-              fontSize: 'var(--text-xs)',
-              fontWeight: 600,
-              color: 'var(--color-brand-text-muted)',
-              backgroundColor: 'var(--color-brand-off-white)',
-            }}>{tag}</span>
-          ))}
-        </div>
+        {/* V3 removed the row of discipline chips that sat here — it duplicated
+            the roots list below and made the section read as credential stacking. */}
 
         <h3 style={{ fontWeight: 800, marginBottom: '1.75rem', color: 'var(--color-brand-text-muted)', textTransform: 'uppercase' as const, fontSize: 'var(--text-xs)', letterSpacing: '0.12em' }}>
           The Roots of the Work
@@ -369,7 +354,7 @@ export default async function AboutPage() {
             Choose Your Next Step
           </h3>
           <p style={{ color: 'rgba(255,255,255,0.6)', lineHeight: 1.7, marginBottom: '2rem', maxWidth: '44ch', margin: '0 auto 2rem' }}>
-            If you are here to understand your own painful patterns, start with <em>Built This Way</em>. If you are here for leadership, forums, retreats, or coaching, explore the SAAQ, coaching, forum retreats, or leadership work.
+            If you are here to understand your own painful patterns, start with <em>Built This Way</em>. If you are here for leadership, forums, retreats, or coaching, explore the leadership path.
           </p>
           <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
             <Link

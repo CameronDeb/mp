@@ -219,6 +219,62 @@ em { font-style: italic; }
   }
 
   /* Buttons */
+
+  /* `.btn` is the shared base. It was referenced across the block components
+     and several pages but never actually defined, so those buttons rendered as
+     bare text with no padding, radius or alignment — the "visually broken or
+     under-styled" buttons in the V3 review. Components layer their own colours
+     on top via inline styles, so this deliberately sets shape only, no colour. */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.875rem 2.25rem;
+    font-family: var(--font-sans);
+    font-size: var(--text-small);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-radius: var(--radius-btn);
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+  }
+
+  .btn:hover { transform: translateY(-1px); }
+
+  /* Outline variant — same footprint as .btn-primary, transparent fill. The
+     border colour is `currentColor` so it always follows the text colour a
+     component sets, and can never end up invisible against its background. */
+  .btn-outline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.875rem 2.25rem;
+    background-color: transparent;
+    color: var(--color-brand-sienna);
+    font-family: var(--font-sans);
+    font-size: var(--text-small);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-radius: var(--radius-btn);
+    border: 2px solid currentColor;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease, transform 0.15s ease;
+  }
+
+  .btn-outline:hover {
+    background-color: var(--color-brand-sienna);
+    color: #ffffff;
+    border-color: var(--color-brand-sienna);
+    transform: translateY(-1px);
+  }
+
   .btn-primary {
     display: inline-flex;
     align-items: center;

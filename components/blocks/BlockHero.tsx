@@ -11,13 +11,24 @@ function isExternal(url: string) {
   return url.startsWith('http://') || url.startsWith('https://');
 }
 
-function CTA({ label, url, primary }: { label: string; url: string; primary: boolean }) {
+/**
+ * The secondary CTA used to be hardcoded to white text with a faint white
+ * border regardless of the block's background, so on a cream hero it was
+ * effectively invisible — the "too faint" secondary CTA in the V3 review.
+ * It now follows the background, and `.btn-outline` draws its border from
+ * `currentColor`, so the two can no longer drift apart.
+ */
+function CTA({
+  label, url, primary, onDark,
+}: { label: string; url: string; primary: boolean; onDark: boolean }) {
   const cls = primary ? 'btn btn-primary' : 'btn btn-outline';
-  const outlineStyle = primary ? {} : { color: '#fff', borderColor: 'rgba(255,255,255,0.3)' };
+  const style: React.CSSProperties =
+    primary || !onDark ? {} : { color: '#ffffff' };
+
   if (isExternal(url)) {
-    return <a href={url} target="_blank" rel="noopener noreferrer" className={cls} style={outlineStyle}>{label}</a>;
+    return <a href={url} target="_blank" rel="noopener noreferrer" className={cls} style={style}>{label}</a>;
   }
-  return <Link href={url} className={cls} style={outlineStyle}>{label}</Link>;
+  return <Link href={url} className={cls} style={style}>{label}</Link>;
 }
 
 export default function BlockHero({ block }: { block: BlockHeroData }) {
@@ -63,10 +74,10 @@ export default function BlockHero({ block }: { block: BlockHeroData }) {
         {(block.cta_primary_label && block.cta_primary_url) || (block.cta_secondary_label && block.cta_secondary_url) ? (
           <div className="mt-10 flex flex-wrap gap-4">
             {block.cta_primary_label && block.cta_primary_url && (
-              <CTA label={block.cta_primary_label} url={block.cta_primary_url} primary={true} />
+              <CTA label={block.cta_primary_label} url={block.cta_primary_url} primary={true} onDark={onDark} />
             )}
             {block.cta_secondary_label && block.cta_secondary_url && (
-              <CTA label={block.cta_secondary_label} url={block.cta_secondary_url} primary={false} />
+              <CTA label={block.cta_secondary_label} url={block.cta_secondary_url} primary={false} onDark={onDark} />
             )}
           </div>
         ) : null}
