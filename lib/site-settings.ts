@@ -21,6 +21,13 @@ export type SiteCopy = {
   newsletterBody: string;
   newsletterButtonLabel: string;
   newsletterPrivacyLine: string;
+  /**
+   * The header's top-right button. V3 made this the launch CTA, and it changes
+   * to "Get the Book" after 22 Oct — so it lives here rather than in code, and
+   * Mark can switch it himself on the day without a deploy.
+   */
+  navCtaLabel: string;
+  navCtaUrl: string;
 };
 
 /** Bundled originals — also the fallback when Directus can't be reached. */
@@ -34,12 +41,14 @@ const LOCAL_FALLBACK: SiteMedia = {
 /** Signed-off copy from the V2 page docs — the fallback for the same reason. */
 export const COPY_FALLBACK: SiteCopy = {
   footerBrandCopy:
-    'SkillfullyAware® helps people understand their patterns, work through them, and continue evolving in life, relationships, and leadership.',
+    'SkillfullyAware® helps people understand painful patterns, work with them in real life, and become wiser, healthier, and more effective in how they live, relate, and lead.',
   newsletterHeading: 'Get the Breaking Bad (habits) Newsletter',
   newsletterBody:
     'Practical reflections on painful patterns, habit change, leadership, and becoming more SkillfullyAware in daily life.',
   newsletterButtonLabel: 'Subscribe',
   newsletterPrivacyLine: 'No spam. Unsubscribe anytime.',
+  navCtaLabel: 'Preorder the Book',
+  navCtaUrl: '/power-tools/book',
 };
 
 type SettingsRow = {
@@ -52,6 +61,8 @@ type SettingsRow = {
   newsletter_body: string | null;
   newsletter_button_label: string | null;
   newsletter_privacy_line: string | null;
+  nav_cta_label: string | null;
+  nav_cta_url: string | null;
 };
 
 function assetUrl(fileId: string | null, fallback: string): string {
@@ -64,7 +75,8 @@ function text(value: string | null | undefined, fallback: string): string {
 
 const FIELDS =
   'logo,logo_mark,hero_image,about_portrait,footer_brand_copy,' +
-  'newsletter_heading,newsletter_body,newsletter_button_label,newsletter_privacy_line';
+  'newsletter_heading,newsletter_body,newsletter_button_label,newsletter_privacy_line,' +
+  'nav_cta_label,nav_cta_url';
 
 async function fetchSettings(): Promise<SettingsRow | null> {
   if (!DIRECTUS_URL) return null;
@@ -105,5 +117,7 @@ export async function getSiteCopy(): Promise<SiteCopy> {
     newsletterBody:        text(row.newsletter_body,         COPY_FALLBACK.newsletterBody),
     newsletterButtonLabel: text(row.newsletter_button_label, COPY_FALLBACK.newsletterButtonLabel),
     newsletterPrivacyLine: text(row.newsletter_privacy_line, COPY_FALLBACK.newsletterPrivacyLine),
+    navCtaLabel:           text(row.nav_cta_label,           COPY_FALLBACK.navCtaLabel),
+    navCtaUrl:             text(row.nav_cta_url,             COPY_FALLBACK.navCtaUrl),
   };
 }

@@ -109,12 +109,19 @@ export function NewsletterSignup({
               value={email}
               onChange={e => setEmail(e.target.value)}
               placeholder="Enter your email"
+              /* V3 design fix: the field read as low-contrast against the orange
+                 band. It now has an explicit white fill, a defined edge, and a
+                 darkened placeholder (see .newsletter-input in globals.css). */
+              className="newsletter-input"
               style={{
                 flex: 1,
                 minWidth: '200px',
                 padding: '0.875rem 1.25rem',
                 borderRadius: '9999px',
-                border: onCream ? '1px solid var(--color-brand-border)' : 'none',
+                backgroundColor: '#ffffff',
+                border: onCream
+                  ? '1px solid var(--color-brand-border)'
+                  : '1px solid rgba(0,0,0,0.18)',
                 fontSize: 'var(--text-small)',
                 outline: 'none',
                 color: 'var(--color-brand-text)',

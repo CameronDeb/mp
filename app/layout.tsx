@@ -40,7 +40,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="en" className={`${jakarta.variable} ${playfair.variable}`}>
       <body style={{ fontFamily: "var(--font-sans)", backgroundColor: "var(--color-brand-cream)" }}>
-        <Header logo={media.logo} categories={categories} />
+        <Header
+          logo={media.logo}
+          categories={categories}
+          ctaLabel={copy.navCtaLabel}
+          ctaUrl={copy.navCtaUrl}
+        />
         <main>{children}</main>
         <Footer
           blogCategories={categories.map((c) => c.name)}

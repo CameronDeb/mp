@@ -19,8 +19,10 @@ function buildNavigation(blogCategories: HeaderCategory[]) {
         { name: 'The Science', href: '/about#science', description: 'Neuroscience behind the work' },
       ],
     },
-    { name: 'Forum Retreats', href: '/forum-retreats' },
-    { name: 'SAAQ Coaching',  href: '/consultation'   },
+    // V3 promoted the book into the main nav for the launch window.
+    { name: 'Book',           href: '/power-tools/book' },
+    { name: 'Forum Retreats', href: '/forum-retreats'   },
+    { name: 'SAAQ Coaching',  href: '/consultation'     },
     {
       name: 'Power Tools',
       href: '/power-tools',
@@ -50,9 +52,14 @@ function buildNavigation(blogCategories: HeaderCategory[]) {
 export function Header({
   logo = '/logos/logo-2026.png',
   categories = [],
+  ctaLabel = 'Preorder the Book',
+  ctaUrl = '/power-tools/book',
 }: {
   logo?: string;
   categories?: HeaderCategory[];
+  /** Launch CTA, from site_settings so it can become "Get the Book" on 22 Oct. */
+  ctaLabel?: string;
+  ctaUrl?: string;
 }) {
   const navigation = buildNavigation(categories);
   const [pastHero, setPastHero]         = useState(false);
@@ -178,7 +185,7 @@ export function Header({
               <Search className="w-5 h-5" />
             </button>
 
-            <Link href="/#start" style={{
+            <Link href={ctaUrl} style={{
               border: '1.5px solid #c34d27',
               backgroundColor: 'transparent',
               color: '#c34d27',
@@ -194,7 +201,7 @@ export function Header({
               onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#c34d27'; e.currentTarget.style.color = '#ffffff'; }}
               onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = '#c34d27'; }}
             >
-              Start Here
+              {ctaLabel}
             </Link>
           </div>
 
@@ -259,9 +266,9 @@ export function Header({
                 </div>
               ))}
               <div style={{ paddingTop: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                <Link href="/#start" onClick={() => setMobileOpen(false)}
+                <Link href={ctaUrl} onClick={() => setMobileOpen(false)}
                   style={{ display: 'block', textAlign: 'center', border: '1.5px solid #c34d27', color: '#c34d27', backgroundColor: 'transparent', padding: '0.875rem', borderRadius: '9999px', fontWeight: 600, fontSize: 'var(--text-small)', textDecoration: 'none' }}>
-                  Start Here
+                  {ctaLabel}
                 </Link>
               </div>
             </nav>

@@ -201,12 +201,17 @@ export function Testimonials({
   items = FALLBACK_TESTIMONIALS,
   eyebrow = 'Testimonials',
   heading = 'What People Experience in the Work',
-  intro = 'Reflections from leaders, clients, and participants who have used SkillfullyAware® to understand patterns, deepen trust, and practice meaningful change.',
+  intro = 'Reflections from leaders, clients, and participants who have used SkillfullyAware® to understand patterns, build trust, and practice meaningful change.',
+  ctaLabel,
+  ctaUrl,
 }: {
   items?: Testimonial[];
   eyebrow?: string;
   heading?: string;
   intro?: string;
+  /** V3 added a next step under the proof. Omit either prop to hide it. */
+  ctaLabel?: string;
+  ctaUrl?: string;
 }) {
   const [videoModal, setVideoModal] = useState<string | null>(null);
   const [page, setPage] = useState(0);
@@ -287,6 +292,26 @@ export function Testimonials({
             >
               <ChevronRight className="w-4 h-4" />
             </button>
+          </div>
+        )}
+
+        {/* The proof earns a next step — V3 */}
+        {ctaLabel && ctaUrl && (
+          <div className="text-center" style={{ marginTop: '3rem' }}>
+            <a href={ctaUrl} style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              backgroundColor: 'var(--color-brand-sienna)',
+              color: '#ffffff',
+              padding: '0.875rem 2rem',
+              borderRadius: '9999px',
+              fontWeight: 600,
+              fontSize: 'var(--text-small)',
+              textDecoration: 'none',
+            }}>
+              {ctaLabel} →
+            </a>
           </div>
         )}
       </div>

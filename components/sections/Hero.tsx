@@ -122,15 +122,19 @@ export function Hero({
               ))}
             </div>
 
-            <Link href={copy.hero_scroll_url} style={{
-              fontSize: '1rem',
-              color: '#3d8cad',
-              textDecoration: 'none',
-              fontWeight: 600,
-              letterSpacing: '0.03em',
-            }}>
-              {copy.hero_scroll_label}
-            </Link>
+            {/* V3 removed this link — it opened a second path-selection moment.
+                It renders again the moment hero_scroll_label has a value. */}
+            {copy.hero_scroll_label && (
+              <Link href={copy.hero_scroll_url} style={{
+                fontSize: '1rem',
+                color: '#3d8cad',
+                textDecoration: 'none',
+                fontWeight: 600,
+                letterSpacing: '0.03em',
+              }}>
+                {copy.hero_scroll_label}
+              </Link>
+            )}
 
           </div>
 

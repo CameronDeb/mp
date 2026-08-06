@@ -1,8 +1,15 @@
-import Link from 'next/link';
+import type { HomepageCopy } from '@/lib/homepage';
 
-export function WhyDidIReact() {
+/**
+ * The reflection tool, sitting directly under the book launch section because
+ * it is the book applied to one real moment. The tool is a separate app, so the
+ * CTA is a plain <a> rather than next/link.
+ */
+export function WhyDidIReact({ copy }: { copy: HomepageCopy }) {
+  const external = /^https?:\/\//.test(copy.reflection_cta_url);
+
   return (
-    <section style={{
+    <section id="reflection-tool" style={{
       backgroundColor: 'var(--color-brand-off-white)',
       padding: '5rem 1.5rem',
     }}>
@@ -16,7 +23,7 @@ export function WhyDidIReact() {
           color: 'var(--color-brand-sienna)',
           marginBottom: '1rem',
         }}>
-          Reader Tool
+          {copy.reflection_eyebrow}
         </p>
 
         <h2 style={{
@@ -27,18 +34,19 @@ export function WhyDidIReact() {
           marginBottom: '1.5rem',
           lineHeight: 1.1,
         }}>
-          Make the work personal.
+          {copy.reflection_heading}
         </h2>
 
-        <p style={{
-          fontSize: '1.05rem',
-          color: 'var(--color-brand-text-muted)',
-          lineHeight: 1.75,
-          maxWidth: '52ch',
-          margin: '0 auto 1.25rem',
-        }}>
-          Reading the book helps you understand why painful patterns repeat. The next step is seeing how the pattern shows up in your own life.
-        </p>
+        <p
+          style={{
+            fontSize: '1.05rem',
+            color: 'var(--color-brand-text-muted)',
+            lineHeight: 1.75,
+            maxWidth: '52ch',
+            margin: '0 auto 1.25rem',
+          }}
+          dangerouslySetInnerHTML={{ __html: copy.reflection_body_1 }}
+        />
 
         <p style={{
           fontSize: '1.05rem',
@@ -47,23 +55,27 @@ export function WhyDidIReact() {
           maxWidth: '52ch',
           margin: '0 auto 2.5rem',
         }}>
-          <strong style={{ color: 'var(--color-brand-text)' }}>Why Did I React That Way?</strong> helps you examine one real reaction — a moment when you got triggered, shut down, overreacted, or acted against your better judgment — and begin seeing the deeper pattern underneath.
+          {copy.reflection_body_2}
         </p>
 
-        <Link href="/reader-tool" style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '0.5rem',
-          backgroundColor: 'var(--color-brand-sienna)',
-          color: '#ffffff',
-          padding: '0.875rem 2rem',
-          borderRadius: '9999px',
-          fontWeight: 600,
-          fontSize: 'var(--text-small)',
-          textDecoration: 'none',
-        }}>
-          Try Why Did I React That Way? →
-        </Link>
+        <a
+          href={copy.reflection_cta_url}
+          {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            backgroundColor: 'var(--color-brand-sienna)',
+            color: '#ffffff',
+            padding: '0.875rem 2rem',
+            borderRadius: '9999px',
+            fontWeight: 600,
+            fontSize: 'var(--text-small)',
+            textDecoration: 'none',
+          }}
+        >
+          {copy.reflection_cta_label} →
+        </a>
 
       </div>
     </section>

@@ -678,3 +678,16 @@ em { font-style: italic; }
     grid-template-columns: 1fr 20rem;
   }
 }
+/* ─────────────────────────────────────────────
+   Newsletter email field — V3 contrast fix
+   The placeholder rendered too faint against the
+   orange band, so it is darkened explicitly here.
+   ───────────────────────────────────────────── */
+.newsletter-input::placeholder {
+  color: rgba(0, 0, 0, 0.55);
+  opacity: 1; /* Firefox dims placeholders by default */
+}
+.newsletter-input:focus {
+  border-color: var(--color-brand-navy);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.45);
+}

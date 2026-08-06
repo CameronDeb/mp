@@ -1,16 +1,13 @@
 import type { Metadata } from 'next';
 import { Hero }              from '@/components/sections/Hero';
-import { ChooseYourPath }    from '@/components/sections/ChooseYourPath';
-import { ReaderPathway }     from '@/components/sections/ReaderPathway';
-import { LeaderPathway }     from '@/components/sections/LeaderPathway';
 import { BuiltThisWay }      from '@/components/sections/BuiltThisWay';
-import { SAAQSection }       from '@/components/sections/SAAQSection';
+import { WhyDidIReact }      from '@/components/sections/WhyDidIReact';
+import { LeaderPathway }     from '@/components/sections/LeaderPathway';
 import { PowerToolsPreview } from '@/components/sections/PowerToolsPreview';
-import { NewsletterSignup }  from '@/components/sections/NewsletterSignup';
 import { AboutMark }         from '@/components/sections/AboutMark';
 import { Testimonials }      from '@/components/sections/Testimonials';
 import { LatestBlogPosts }   from '@/components/sections/LatestBlogPosts';
-import { FinalCTA }          from '@/components/sections/FinalCTA';
+import { NewsletterSignup }  from '@/components/sections/NewsletterSignup';
 import { getPageBySlug }     from '@/lib/pages';
 import { getHomepageCopy }   from '@/lib/homepage';
 import { getSiteMedia, getSiteCopy } from '@/lib/site-settings';
@@ -47,30 +44,35 @@ export default async function HomePage() {
   }
 
   // Otherwise the bespoke sections render, every string coming from Directus.
+  //
+  // Order per HomepageDiagnosisV3: the visitor chooses a path once, in the hero,
+  // then sees the next relevant step rather than the whole ecosystem again.
+  // ChooseYourPath, ReaderPathway, SAAQSection and FinalCTA were dropped as
+  // duplicate path-selection moments — the components still exist and can be
+  // put back here if that decision is ever reversed.
   return (
     <div className="min-h-screen">
-      <Hero image={media.heroImage} copy={copy} />  {/* Understand My Patterns / Leadership */}
-      <ChooseYourPath copy={copy} />                 {/* Two entry-point cards */}
-      <ReaderPathway copy={copy} />                  {/* Explore the Ecosystem */}
+      <Hero image={media.heroImage} copy={copy} />  {/* The one path choice */}
+      <BuiltThisWay copy={copy} />                   {/* Launch: publishing Oct 22 */}
+      <WhyDidIReact copy={copy} />                   {/* The book, applied */}
       <LeaderPathway copy={copy} />                  {/* SAAQ → Forum Retreats → Coaching */}
-      <BuiltThisWay copy={copy} />
-      <SAAQSection copy={copy} />
       <PowerToolsPreview copy={copy} />
-      <NewsletterSignup
-        heading={siteCopy.newsletterHeading}
-        body={siteCopy.newsletterBody}
-        buttonLabel={siteCopy.newsletterButtonLabel}
-        privacyLine={siteCopy.newsletterPrivacyLine}
-      />
       <AboutMark portrait={media.aboutPortrait} copy={copy} />
       <Testimonials
         items={testimonials}
         eyebrow={copy.testimonials_eyebrow}
         heading={copy.testimonials_heading}
         intro={copy.testimonials_intro}
+        ctaLabel={copy.testimonials_cta_label}
+        ctaUrl={copy.testimonials_cta_url}
       />
       <LatestBlogPosts copy={copy} posts={posts.slice(0, 3)} />
-      <FinalCTA copy={copy} />
+      <NewsletterSignup
+        heading={siteCopy.newsletterHeading}
+        body={siteCopy.newsletterBody}
+        buttonLabel={siteCopy.newsletterButtonLabel}
+        privacyLine={siteCopy.newsletterPrivacyLine}
+      />
     </div>
   );
 }

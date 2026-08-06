@@ -1,11 +1,21 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+// V3 removed the duplicate footer signup form; the newsletter section on each
+// page is now the only place that asks for an email.
 import Link from 'next/link';
 import { ExternalLink, PlayCircle, Camera, Mail } from 'lucide-react';
 
 // ── Link data ────────────────────────────────────────────────────────────────
 const columns = [
+  // V3 gave the book its own column for the launch window.
+  {
+    heading: 'The Book',
+    links: [
+      { name: 'Built This Way',           href: '/power-tools/book'             },
+      { name: 'Launch Team',              href: '/power-tools/book'             },
+      { name: 'Why Did I React That Way?', href: 'https://why-did-i-react.vercel.app/', external: true },
+    ],
+  },
   {
     heading: 'Forum Retreats',
     links: [
@@ -56,74 +66,6 @@ const socials = [
   { label: 'Email',     href: 'mailto:mark@drmarkpirtle.com',  icon: Mail         },
 ];
 
-// ── Newsletter form (unchanged from original) ────────────────────────────────
-function NewsletterForm({ buttonLabel }: { buttonLabel: string }) {
-  const [mounted, setMounted] = useState(false);
-  const [email,   setEmail]   = useState('');
-  const [status,  setStatus]  = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
-
-  useEffect(() => { setMounted(true); }, []);
-
-  async function handleSignup() {
-    if (!email) return;
-    setStatus('loading');
-    try {
-      const res = await fetch('/api/newsletter/subscribe', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, source_page: `${window.location.pathname} (footer)` }),
-      });
-      if (res.ok) { setStatus('success'); setEmail(''); setTimeout(() => setStatus('idle'), 5000); }
-      else setStatus('error');
-    } catch { setStatus('error'); }
-  }
-
-  if (!mounted) {
-    return (
-      <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' as const }}>
-        <div style={{ flex: 1, minWidth: 0, height: '3.25rem', backgroundColor: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '9999px' }} />
-        <div style={{ width: '8rem', height: '3.25rem', backgroundColor: 'var(--color-brand-sienna)', borderRadius: '9999px', opacity: 0.8 }} />
-      </div>
-    );
-  }
-
-  if (status === 'success') {
-    return (
-      <div style={{ backgroundColor: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.3)', color: '#4ade80', padding: '1rem 1.5rem', borderRadius: '0.75rem', fontSize: 'var(--text-small)' }}>
-        ✓ Thank you! Check your email for confirmation.
-      </div>
-    );
-  }
-
-  return (
-    <div>
-      <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' as const }}>
-        <input
-          type="email" value={email} onChange={e => setEmail(e.target.value)}
-          placeholder="Your email address"
-          onKeyDown={e => e.key === 'Enter' && handleSignup()}
-          style={{ flex: 1, minWidth: 0, padding: '0.875rem 1.25rem', backgroundColor: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '9999px', color: '#ffffff', fontSize: 'var(--text-small)', fontFamily: 'var(--font-sans)', outline: 'none' }}
-          onFocus={e => (e.currentTarget.style.borderColor = 'rgba(192,82,42,0.6)')}
-          onBlur={e  => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)')}
-        />
-        <button
-          onClick={handleSignup}
-          style={{ padding: '0.875rem 2rem', backgroundColor: 'var(--color-brand-sienna)', color: '#ffffff', border: 'none', borderRadius: '9999px', fontFamily: 'var(--font-sans)', fontSize: 'var(--text-small)', fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase' as const, cursor: status === 'loading' ? 'not-allowed' : 'pointer', whiteSpace: 'nowrap' as const, opacity: status === 'loading' ? 0.7 : 1, transition: 'background-color 0.2s' }}
-          onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'var(--color-brand-sienna-dark)')}
-          onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'var(--color-brand-sienna)')}
-        >
-          {status === 'loading' ? 'Subscribing…' : buttonLabel}
-        </button>
-      </div>
-      {status === 'error' && (
-        <p style={{ color: '#f87171', fontSize: 'var(--text-xs)', marginTop: '0.5rem' }}>
-          Something went wrong. Please try again.
-        </p>
-      )}
-    </div>
-  );
-}
-
 // ── Shared link style helper ─────────────────────────────────────────────────
 const mutedLink: React.CSSProperties = {
   color: 'rgba(255,255,255,0.45)',
@@ -138,9 +80,6 @@ export function Footer({
   blogCategories = [],
   brandCopy,
   newsletterHeading,
-  newsletterBody,
-  newsletterButtonLabel,
-  newsletterPrivacyLine,
 }: {
   blogCategories?: string[];
   brandCopy: string;
@@ -152,20 +91,22 @@ export function Footer({
   return (
     <footer style={{ backgroundColor: 'var(--color-brand-navy)', color: '#ffffff' }}>
 
-      {/* ── Newsletter band (unchanged) ── */}
+      {/* ── Newsletter link ──
+          V3 removed the second signup form. Every page already carries the
+          full newsletter section, so the footer keeps a single quiet link to
+          it rather than asking for the same email twice on one screen. */}
       <div style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
-        <div className="container" style={{ paddingTop: '5rem', paddingBottom: '5rem' }}>
-          <div style={{ maxWidth: '36rem', margin: '0 auto', textAlign: 'center' }}>
-            <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-title)', fontWeight: 600, color: '#ffffff', marginBottom: '1rem', letterSpacing: '-0.02em' }}>
-              {newsletterHeading}
-            </h3>
-            <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: 'var(--text-lead)', marginBottom: '2rem' }}>
-              {newsletterBody}
-            </p>
-            <NewsletterForm buttonLabel={newsletterButtonLabel} />
-            <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: 'var(--text-xs)', marginTop: '1rem' }}>
-              {newsletterPrivacyLine}
-            </p>
+        <div className="container" style={{ paddingTop: '2.5rem', paddingBottom: '2.5rem' }}>
+          <div style={{ textAlign: 'center' }}>
+            <Link href="/#newsletter" style={{
+              color: '#ffffff',
+              fontSize: 'var(--text-small)',
+              fontWeight: 600,
+              textDecoration: 'none',
+              letterSpacing: '0.02em',
+            }}>
+              {newsletterHeading} →
+            </Link>
           </div>
         </div>
       </div>

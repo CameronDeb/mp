@@ -2,8 +2,14 @@
 // Homepage copy, managed in the Directus `homepage` singleton.
 //
 // The layout lives in the section components; every string on the page lives
-// here. Each field falls back to the copy signed off in Homepage Copy Edits V3
-// so the page never renders empty if Directus is unreachable.
+// here. Each field falls back to the copy signed off in HomepageDiagnosisV3 so
+// the page never renders empty if Directus is unreachable.
+//
+// V3 dropped five sections from the homepage (Choose Your Path, Explore the
+// Ecosystem, the standalone SAAQ section, the old Start Here book section and
+// the Final Summary). Their fields are deliberately kept below — the sections
+// are no longer rendered, not deleted, so any of them can be restored by
+// putting the component back in app/page.tsx.
 
 const DIRECTUS_URL = process.env.NEXT_PUBLIC_DIRECTUS_URL;
 const DIRECTUS_TOKEN = process.env.DIRECTUS_STATIC_TOKEN;
@@ -52,6 +58,15 @@ export type HomepageCopy = {
   book_cta_primary_url: string;
   book_cta_secondary_label: string;
   book_cta_secondary_url: string;
+  book_link_label: string;
+  book_link_url: string;
+
+  reflection_eyebrow: string;
+  reflection_heading: string;
+  reflection_body_1: string;
+  reflection_body_2: string;
+  reflection_cta_label: string;
+  reflection_cta_url: string;
 
   saaq_eyebrow: string;
   saaq_heading: string;
@@ -84,6 +99,8 @@ export type HomepageCopy = {
   testimonials_eyebrow: string;
   testimonials_heading: string;
   testimonials_intro: string;
+  testimonials_cta_label: string;
+  testimonials_cta_url: string;
 
   blog_eyebrow: string;
   blog_heading: string;
@@ -104,18 +121,20 @@ export type HomepageCopy = {
   seo_description: string;
 };
 
-/** Homepage Copy Edits V3 — also the fallback when Directus can't be reached. */
+/** HomepageDiagnosisV3 copy — also the fallback when Directus can't be reached. */
 export const HOMEPAGE_FALLBACK: HomepageCopy = {
   hero_headline: 'Why do painful patterns repeat in life and at work?',
   hero_body_1: 'You can understand the issue and still struggle to change it.',
   hero_body_2:
-    'SkillfullyAware® helps you understand your patterns, work through them, and grow into a wiser, healthier, more effective human being.',
+    'SkillfullyAware® helps you understand your patterns, work with them in real life, and become wiser, healthier, and more effective in how you live, relate, and lead.',
   hero_orientation_line: 'Choose the path that fits why you’re here today.',
   hero_ctas: [
     { title: 'Understand My Patterns', subtitle: 'Start with the Book', url: '/power-tools/book' },
     { title: 'Leadership, Forums & Retreats', subtitle: 'Explore Leadership Work', url: '/forum-retreats' },
   ],
-  hero_scroll_label: 'Not sure where to begin? Start here →',
+  // V3 removed the "Not sure where to begin?" link — it pointed at the deleted
+  // Choose Your Path section. Blank label hides it; refill to bring it back.
+  hero_scroll_label: '',
   hero_scroll_url: '/#start',
 
   path_eyebrow: 'One Ecosystem. Two Clear Paths.',
@@ -157,26 +176,45 @@ export const HOMEPAGE_FALLBACK: HomepageCopy = {
   leadership_eyebrow: 'For Leaders',
   leadership_heading: 'For leaders, founders, forums, and teams',
   leadership_body_1:
-    'The same patterns that shape personal life also show up in leadership — in decision-making, conflict, trust, avoidance, over-control, burnout, and the private pressure many high-performing people carry alone.',
+    'The same patterns that shape personal life also show up in leadership: decision-making, conflict, trust, avoidance, over-control, burnout, and the private pressure many high-performing people carry alone.',
   leadership_body_2:
-    'SkillfullyAware® experiences help leaders and groups build clearer self-awareness, stronger trust, more honest conversations, and practical growth.',
+    'SkillfullyAware® leadership work helps leaders and groups see those patterns more clearly, talk about them more honestly, and practice better ways of responding under pressure.',
   leadership_cards: [
-    { title: 'SAAQ for Leaders', body: 'A private developmental reflection on how you lead, relate, decide, protect, and grow under pressure.', cta_label: 'Explore the SAAQ', cta_url: '/consultation' },
+    { title: 'SAAQ for Leaders', body: 'A private developmental reflection on how you lead, relate, decide, protect, and grow under pressure.', cta_label: 'Explore SAAQ Coaching', cta_url: '/consultation' },
     { title: 'Forum Retreats', body: 'Guided experiences for EO/YPO forums and leadership groups ready for honest, skillful, well-held development.', cta_label: 'Explore Forum Retreats', cta_url: '/forum-retreats' },
-    { title: 'Executive Coaching', body: 'One-on-one support for leaders navigating pressure, transition, conflict, decision-making, identity, or growth.', cta_label: 'Explore Coaching', cta_url: '/consultation#book' },
+    { title: 'Executive Coaching', body: 'One-on-one support for leaders navigating pressure, transition, conflict, decision-making, identity, or growth.', cta_label: 'Book a Conversation', cta_url: '/contact' },
   ],
 
-  book_eyebrow: 'Start Here',
-  book_heading: 'Start with the book. Understand why the pattern repeats.',
+  // V3: this is now the launch section directly under the hero. The "START HERE"
+  // eyebrow was dropped — it implied every visitor should begin with the book,
+  // which contradicts the two-path structure.
+  book_eyebrow: 'The Book',
+  book_heading: 'Built This Way is publishing October 22',
   book_body_1: 'There’s nothing wrong with you. There is a reason the pattern repeats.',
   book_body_2:
-    'People do not repeat painful patterns because they lack willpower or are unwilling to change. They repeat them because old adaptations, nervous system patterns, emotional memory, and practiced responses often move faster than conscious choice.',
+    '<strong>Built This Way: Why Painful Patterns Repeat and How to Change Them</strong> is the best place to begin if you want to understand why old patterns repeat and how real change becomes possible.',
   book_body_3:
-    '<strong>Built This Way</strong> helps you understand why you react before you can think, why insight alone is not enough, and how real change becomes possible through awareness, practice, integration, and compassion.',
-  book_cta_primary_label: 'Get Book Updates & Reader Bonuses',
-  book_cta_primary_url: '/power-tools/book#tiers',
-  book_cta_secondary_label: 'Learn More About the Book',
+    'The book is for people who know better but still react anyway, who understand the issue but keep finding themselves back in the same loop. It is also useful for parents, partners, leaders, coaches, therapists, and anyone who wants to understand the patterns that shape how people respond under stress.',
+  // TODO: swap to the publisher's preorder URL once it exists — it points at the
+  // book page meanwhile so the CTA is never dead.
+  book_cta_primary_label: 'Preorder the Book',
+  book_cta_primary_url: '/power-tools/book',
+  book_cta_secondary_label: 'Join the Launch Team',
+  // TODO: retarget once the Launch Team page is rewritten. V3 asks for it with
+  // no tiers and no fundraising language, so it deliberately does NOT point at
+  // the existing #tiers section — that is the part being removed.
   book_cta_secondary_url: '/power-tools/book',
+  book_link_label: 'Learn more about Built This Way →',
+  book_link_url: '/power-tools/book',
+
+  reflection_eyebrow: 'Reader Tool',
+  reflection_heading: 'Try Why Did I React That Way?',
+  reflection_body_1:
+    '<strong>Why Did I React That Way?</strong> is a reflection tool connected to <em>Built This Way</em>. Use it after a moment when you reacted, shut down, got defensive, felt hurt, got angry, or repeated an old pattern.',
+  reflection_body_2:
+    'The tool helps you slow the moment down and look at what may have been happening in your body, your story, your emotional pattern, and your next best practice step.',
+  reflection_cta_label: 'Try the Reflection Tool',
+  reflection_cta_url: 'https://why-did-i-react.vercel.app/',
 
   saaq_eyebrow: 'Go Deeper',
   saaq_heading: 'Go deeper with the SAAQ.',
@@ -195,7 +233,7 @@ export const HOMEPAGE_FALLBACK: HomepageCopy = {
   powertools_heading: 'Practice the Change',
   powertools_body_1: 'Insight matters, but insight alone rarely changes a pattern.',
   powertools_body_2:
-    'Power Tools are online classes, workbooks, guided meditations, and practical exercises that help you work with attention, emotion, habits, reactions, and relationships in daily life.',
+    'Power Tools are classes, workbooks, guided meditations, books, and practical resources that help you keep practicing after the first insight. Use them when attention is fixated, emotions are activated, habits are running, or you want support working with a specific pattern.',
   powertools_items: [
     { category: 'Online Classes', name: 'Project SkillfullyAware', href: '/power-tools#online-classes', tag: 'Class' },
     { category: 'Online Classes', name: 'Overcoming Addictive Behaviors', href: '/power-tools#online-classes', tag: 'Class' },
@@ -215,25 +253,27 @@ export const HOMEPAGE_FALLBACK: HomepageCopy = {
   about_eyebrow: 'About Dr. Mark',
   about_heading: 'Meet Dr. Mark Pirtle',
   about_body_1:
-    'Dr. Mark Pirtle is the creator of SkillfullyAware®, a practical system for helping people understand their patterns, work through them, expand their perspective, and continue evolving throughout life.',
+    'Dr. Mark Pirtle is the creator of SkillfullyAware®, author of Built This Way, and creator of the SkillfullyAware Awareness Quotient, or SAAQ.',
   about_body_2:
-    'His work integrates mindfulness, neuroscience, developmental psychology, somatic awareness, shadow integration, habit change, and decades of experience helping people lead, relate, practice, and grow.',
+    'His work helps people understand why painful patterns repeat, how those patterns shape life and leadership, and how awareness, practice, integration, and compassion make change possible.',
   about_body_3:
-    'He is the author of Built This Way: Why Painful Patterns Repeat and How to Change Them, and the creator of the SkillfullyAware Awareness Quotient, or SAAQ.',
+    'Mark’s teaching brings together mindfulness, adult development, shadow work, somatic awareness, systems thinking, and decades of work with clients, leaders, groups, and retreat participants.',
   about_cta_primary_label: 'Read Full Story',
   about_cta_primary_url: '/about',
-  about_cta_secondary_label: 'Get in Touch',
+  about_cta_secondary_label: 'Book a Conversation',
   about_cta_secondary_url: '/contact',
 
   testimonials_eyebrow: 'Testimonials',
   testimonials_heading: 'What People Experience in the Work',
   testimonials_intro:
-    'Reflections from leaders, clients, and participants who have used SkillfullyAware® to understand patterns, deepen trust, and practice meaningful change.',
+    'Reflections from leaders, clients, and participants who have used SkillfullyAware® to understand patterns, build trust, and practice meaningful change.',
+  testimonials_cta_label: 'Book a Conversation',
+  testimonials_cta_url: '/contact',
 
   blog_eyebrow: 'The Blog',
   blog_heading: 'Breaking Bad <em>(habits)</em>',
   blog_body:
-    'Essays on why we get stuck, why change is hard, and how to practice becoming more SkillfullyAware in daily life.',
+    'Essays on why painful patterns repeat, why change is hard, and how to practice becoming more SkillfullyAware in daily life.',
   blog_cta_label: 'Read the Latest Essays',
   blog_cta_url: '/blog',
 

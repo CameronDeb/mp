@@ -80,25 +80,29 @@ export function BuiltThisWay({ copy }: { copy: HomepageCopy }) {
             {copy.book_body_1}
           </p>
 
-          <p style={{
-            fontSize: '1.05rem',
-            color: 'var(--color-brand-text-muted)',
-            lineHeight: 1.75,
-            marginBottom: '1.25rem',
-          }}>
-            {copy.book_body_2}
-          </p>
+          <p
+            style={{
+              fontSize: '1.05rem',
+              color: 'var(--color-brand-text-muted)',
+              lineHeight: 1.75,
+              marginBottom: '1.25rem',
+            }}
+            dangerouslySetInnerHTML={{ __html: copy.book_body_2 }}
+          />
 
-          <p style={{
-            fontSize: '1.05rem',
-            color: 'var(--color-brand-text-muted)',
-            lineHeight: 1.75,
-            marginBottom: '2rem',
-          }}>
-            <span dangerouslySetInnerHTML={{ __html: copy.book_body_3 }} />
-          </p>
+          <p
+            style={{
+              fontSize: '1.05rem',
+              color: 'var(--color-brand-text-muted)',
+              lineHeight: 1.75,
+              marginBottom: '2rem',
+            }}
+            dangerouslySetInnerHTML={{ __html: copy.book_body_3 }}
+          />
 
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
+          {/* Two CTAs of equal weight — preorder and launch team — then a quiet
+              third link for people who want to read about the book first. */}
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', alignItems: 'center' }}>
             <Link href={copy.book_cta_primary_url} style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -117,15 +121,31 @@ export function BuiltThisWay({ copy }: { copy: HomepageCopy }) {
             <Link href={copy.book_cta_secondary_url} style={{
               display: 'inline-flex',
               alignItems: 'center',
+              border: '1.5px solid var(--color-brand-sienna)',
+              color: 'var(--color-brand-sienna)',
+              padding: '0.875rem 2rem',
+              borderRadius: '9999px',
+              fontWeight: 600,
+              fontSize: 'var(--text-small)',
+              textDecoration: 'none',
+            }}>
+              {copy.book_cta_secondary_label}
+            </Link>
+          </div>
+
+          {copy.book_link_label && (
+            <Link href={copy.book_link_url} style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              marginTop: '1.5rem',
               fontSize: 'var(--text-small)',
               fontWeight: 600,
               color: 'var(--color-brand-text-muted)',
               textDecoration: 'none',
-              padding: '0.875rem 0',
             }}>
-              {copy.book_cta_secondary_label} →
+              {copy.book_link_label}
             </Link>
-          </div>
+          )}
         </div>
 
       </div>
