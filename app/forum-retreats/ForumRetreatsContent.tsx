@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { ArrowRight, Check, Plus, Minus, Users, Clock, MapPin } from 'lucide-react';
+import { ForumRetreatInquirySection } from '@/components/forum-retreats/ForumRetreatInquirySection';
 
 // ─── DATA ────────────────────────────────────────────────────────────────────
 
@@ -456,32 +457,12 @@ export default function ForumRetreatsContent() {
         </div>
       </section>
 
-      {/* ── FINAL CTA ── */}
-      <section id="inquiry" style={{
-        background: 'linear-gradient(135deg, var(--color-brand-sienna-dark) 0%, var(--color-brand-sienna) 100%)',
-        padding: '6rem 1.5rem',
-      }}>
-        <div className="container" style={{ textAlign: 'center', maxWidth: 640 }}>
-          <h2 style={{ color: '#ffffff', marginBottom: '1.25rem' }}>
-            Give your forum more than another good trip.
-          </h2>
-          <p style={{ color: 'rgba(255,255,255,0.82)', fontSize: 'var(--text-lead)', lineHeight: 1.75, marginBottom: '2.5rem' }}>
-            Create a private, carefully held retreat that helps your group deepen trust, see patterns more clearly, and leave with language and practices you can keep using.
-          </p>
-          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link href="/contact?type=retreat" className="btn-secondary">
-              Plan Your Forum Retreat <ArrowRight className="w-4 h-4 ml-2" />
-            </Link>
-            <Link href="/contact?type=call" style={{
-              display: 'inline-flex', alignItems: 'center',
-              color: 'rgba(255,255,255,0.75)', fontSize: 'var(--text-small)', fontWeight: 600,
-              textDecoration: 'underline', textUnderlineOffset: 4,
-            }}>
-              Book a 30-Min Call
-            </Link>
-          </div>
-        </div>
-      </section>
+      {/* ── INQUIRY FORM ── */}
+      <ForumRetreatInquirySection
+        anchorId="inquiry"
+        heading="Give your forum more than another good trip."
+        intro="Create a private, carefully held retreat that helps your group deepen trust, see patterns more clearly, and leave with language and practices you can keep using."
+      />
 
     </div>
   );

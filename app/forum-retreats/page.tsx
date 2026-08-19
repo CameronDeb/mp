@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { getPageBySlug, buildMetadata } from '@/lib/pages';
 import BlockRenderer from '@/components/blocks/BlockRenderer';
 import ForumRetreatsContent from './ForumRetreatsContent';
+import { ForumRetreatInquirySection } from '@/components/forum-retreats/ForumRetreatInquirySection';
 
 const DEFAULT_META = {
   title: 'Forum Retreats & SAAQ Immersions | Dr. Mark Pirtle | SkillfullyAware®',
@@ -19,6 +20,10 @@ export default async function ForumRetreatsPage() {
     return (
       <main className="min-h-screen" style={{ backgroundColor: 'var(--color-bg)' }}>
         <BlockRenderer blocks={cmsPage.blocks} />
+        {/* The inquiry form is code, not a CMS block — appended so the page's
+            "#inquiry" links and its "fill out a short inquiry form" step resolve
+            to a real form. Mirrors how /contact appends ContactForm. */}
+        <ForumRetreatInquirySection />
       </main>
     );
   }
