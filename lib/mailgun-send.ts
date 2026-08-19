@@ -84,17 +84,30 @@ export async function sendNewsletterToSubscribers(subject: string, html: string)
   return { recipientCount: recipients.length, messageIds };
 }
 
-/** Low-level single-recipient send — shared by test sends and the signup confirmation. */
-async function sendSimpleEmail(to: string, subject: string, html: string): Promise<{ messageId: string }> {
+export interface SimpleEmailOptions {
+  /** Overrides MAILGUN_FROM — form mail goes out as `hello@`, not `newsletter@`. */
+  from?: string;
+  /** So replying to a notification lands in the enquirer's inbox, not Mailgun's. */
+  replyTo?: string;
+}
+
+/** Low-level single-recipient send — shared by test sends, signup confirmations, and form mail. */
+export async function sendSimpleEmail(
+  to: string,
+  subject: string,
+  html: string,
+  options: SimpleEmailOptions = {}
+): Promise<{ messageId: string }> {
   if (!MAILGUN_API_KEY || !MAILGUN_DOMAIN) {
     throw new Error('Mailgun not configured — set MAILGUN_API_KEY and MAILGUN_DOMAIN');
   }
 
   const form = new FormData();
-  form.append('from', MAILGUN_FROM);
+  form.append('from', options.from || MAILGUN_FROM);
   form.append('to', to);
   form.append('subject', subject);
   form.append('html', html);
+  if (options.replyTo) form.append('h:Reply-To', options.replyTo);
 
   const res = await fetch(`https://api.mailgun.net/v3/${MAILGUN_DOMAIN}/messages`, {
     method: 'POST',

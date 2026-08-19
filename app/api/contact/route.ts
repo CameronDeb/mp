@@ -1,12 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import formData from 'form-data';
-import Mailgun from 'mailgun.js';
+import { saveAndNotify, EMAIL_RE } from '@/lib/inquiries';
 
-// Phase 1: contact submissions are a one-off notification email to Mark.
-// No Directus storage, no nurture sequence, no newsletter subscription.
-const MAILGUN_API_KEY = process.env.MAILGUN_API_KEY;
-const MAILGUN_DOMAIN  = process.env.MAILGUN_DOMAIN;
-const NOTIFY_TO       = process.env.CONTACT_NOTIFICATION_EMAIL;
+// Contact submissions are stored in Directus (`contact_submissions`), notified to the
+// admin, and acknowledged with an auto-reply. See lib/inquiries.ts for the partial-
+// failure contract.
 
 const REASON_LABELS: Record<string, string> = {
   general:  'General enquiry',
@@ -17,13 +14,16 @@ const REASON_LABELS: Record<string, string> = {
   speaking: 'Speaking / media',
 };
 
-function escapeHtml(value: string) {
-  return value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
-}
+/** What the auto-reply promises, per reason. Keeps the acknowledgement specific
+ *  rather than a generic "we got your message". */
+const REASON_ACKS: Record<string, string> = {
+  general:  'Mark reads every message personally and will get back to you as soon as he can.',
+  book:     'Mark will be in touch with details on Built This Way and how to join the launch team.',
+  saaq:     'Mark will follow up with how the SAAQ works and what a consultation involves.',
+  retreat:  'Mark will be in touch to learn more about your forum and what a retreat could look like for your group.',
+  call:     'Mark will follow up shortly with a couple of times for a 30-minute call.',
+  speaking: 'Mark will get back to you about the event, format, and availability.',
+};
 
 export async function POST(request: NextRequest) {
   let body: Record<string, unknown>;
@@ -33,11 +33,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid request.' }, { status: 400 });
   }
 
-  const name    = String(body.name    ?? '').trim();
-  const email   = String(body.email   ?? '').trim();
-  const message = String(body.message ?? '').trim();
-  const reason  = String(body.reason  ?? 'general').trim();
-  const company = String(body.company ?? '').trim(); // honeypot
+  const name       = String(body.name        ?? '').trim();
+  const email      = String(body.email       ?? '').trim();
+  const message    = String(body.message     ?? '').trim();
+  const reason     = String(body.reason      ?? 'general').trim();
+  const sourcePage = String(body.source_page ?? '').trim();
+  const company    = String(body.company     ?? '').trim(); // honeypot
 
   // Bot filled the hidden field — accept silently so it doesn't retry.
   if (company) return NextResponse.json({ ok: true });
@@ -45,54 +46,56 @@ export async function POST(request: NextRequest) {
   if (!name || !email || !message) {
     return NextResponse.json({ error: 'Name, email, and message are required.' }, { status: 400 });
   }
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+  if (!EMAIL_RE.test(email)) {
     return NextResponse.json({ error: 'Please enter a valid email address.' }, { status: 400 });
   }
 
-  if (!MAILGUN_API_KEY || !MAILGUN_DOMAIN || !NOTIFY_TO) {
-    // Don't pretend it sent — a silently dropped enquiry is worse than an error.
-    console.error(
-      '[contact] Missing mail config:',
-      { hasKey: !!MAILGUN_API_KEY, hasDomain: !!MAILGUN_DOMAIN, hasRecipient: !!NOTIFY_TO }
-    );
-    return NextResponse.json(
-      { error: 'Contact form is not configured yet. Please email us directly.' },
-      { status: 500 }
-    );
-  }
+  const storedReason = reason in REASON_LABELS ? reason : 'general';
+  const reasonLabel = REASON_LABELS[storedReason];
 
-  const reasonLabel = REASON_LABELS[reason] ?? reason;
-
-  try {
-    const mailgun = new Mailgun(formData);
-    const mg = mailgun.client({ username: 'api', key: MAILGUN_API_KEY });
-
-    await mg.messages.create(MAILGUN_DOMAIN, {
-      from: `Website Contact Form <noreply@${MAILGUN_DOMAIN}>`,
-      to: [NOTIFY_TO],
-      'h:Reply-To': email,
+  const result = await saveAndNotify({
+    collection: 'contact_submissions',
+    payload: {
+      name,
+      email,
+      reason: storedReason,
+      message,
+      source_page: sourcePage || null,
+      status: 'New',
+    },
+    notification: {
       subject: `[${reasonLabel}] New message from ${name}`,
-      text:
-        `New contact form submission\n\n` +
-        `Name:   ${name}\n` +
-        `Email:  ${email}\n` +
-        `About:  ${reasonLabel}\n\n` +
-        `Message:\n${message}\n`,
-      html:
-        `<h2 style="font-family:Georgia,serif">New contact form submission</h2>` +
-        `<p><strong>Name:</strong> ${escapeHtml(name)}<br/>` +
-        `<strong>Email:</strong> <a href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a><br/>` +
-        `<strong>About:</strong> ${escapeHtml(reasonLabel)}</p>` +
-        `<p><strong>Message:</strong></p>` +
-        `<p style="white-space:pre-wrap">${escapeHtml(message)}</p>`,
-    });
+      heading: 'New contact form submission',
+      fields: [
+        ['Name', name],
+        ['Email', email],
+        ['About', reasonLabel],
+        ['From page', sourcePage],
+      ],
+      message,
+      replyTo: email,
+    },
+    autoReply: {
+      to: email,
+      subject: 'Thanks for getting in touch',
+      heading: 'Thanks for getting in touch',
+      paragraphs: [
+        `Hi ${name.split(' ')[0]},`,
+        'Your message came through — this is just to confirm it landed.',
+        REASON_ACKS[storedReason],
+        'If anything else comes to mind in the meantime, simply reply to this email.',
+      ],
+      footnote: 'This is an automatic acknowledgement of the message you sent at drmarkpirtle.com.',
+    },
+  });
 
-    return NextResponse.json({ ok: true });
-  } catch (err) {
-    console.error('[contact] Mailgun send failed:', err);
+  if (!result.ok) {
+    // Nothing stored and nobody notified — don't pretend it sent.
     return NextResponse.json(
-      { error: 'Could not send your message. Please try again shortly.' },
+      { error: 'Could not send your message. Please try again shortly, or email mark@drmarkpirtle.com directly.' },
       { status: 502 }
     );
   }
+
+  return NextResponse.json({ ok: true });
 }

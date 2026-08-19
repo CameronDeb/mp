@@ -6,6 +6,7 @@ import { useState } from 'react';
 export function InterestListForm({ experienceSlug }: { experienceSlug: string }) {
   const [firstName, setFirstName] = useState('');
   const [email, setEmail] = useState('');
+  const [company, setCompany] = useState(''); // honeypot — real people leave this empty
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
   async function handleSubmit() {
@@ -15,7 +16,7 @@ export function InterestListForm({ experienceSlug }: { experienceSlug: string })
       const res = await fetch('/api/interest-list', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ firstName, email, experience: experienceSlug }),
+        body: JSON.stringify({ firstName, email, experience: experienceSlug, company }),
       });
       setStatus(res.ok ? 'success' : 'error');
     } catch {
@@ -51,6 +52,14 @@ export function InterestListForm({ experienceSlug }: { experienceSlug: string })
         onChange={(e) => setEmail(e.target.value)}
         className="interest-form-input"
       />
+      {/* Honeypot — visually hidden, ignored by humans, filled by bots */}
+      <div style={{ position: 'absolute', left: '-9999px' }} aria-hidden="true">
+        <label htmlFor={`il-company-${experienceSlug}`}>Company</label>
+        <input
+          id={`il-company-${experienceSlug}`} type="text" tabIndex={-1} autoComplete="off"
+          value={company} onChange={(e) => setCompany(e.target.value)}
+        />
+      </div>
       <button
         onClick={handleSubmit}
         disabled={status === 'loading'}
