@@ -1,21 +1,21 @@
-'use client';
-
-import { useState } from 'react';
 import Link from 'next/link';
 import {
-  CheckCircle, ArrowRight, BookOpen, Users, Mic,
-  Heart, Star, Sparkles, Lock,
+  CheckCircle, ArrowRight, BookOpen, Users,
+  Heart, Star, Sparkles,
 } from 'lucide-react';
 
 /* ─────────────────────────────────────────────
    TIER DATA
-   Prices are placeholders — update with real
-   Stripe Price IDs once set in dashboard.
+   Each tier links straight to its Stripe Payment
+   Link. Paste the four URLs into .env.local as
+   NEXT_PUBLIC_STRIPE_LINK_TIER1..4 — a tier with
+   no link renders a disabled "Coming soon" button
+   instead of a dead checkout.
 ───────────────────────────────────────────── */
 const TIERS = [
   {
     id: 'founding-reader',
-    stripePriceId: 'price_REPLACE_TIER1',   // TODO: real Stripe Price ID
+    stripeLink: process.env.NEXT_PUBLIC_STRIPE_LINK_TIER1,
     label: 'Tier 1',
     name: 'Founding Reader Circle',
     tagline: 'For readers who want the book and a simple way to begin practicing the work.',
@@ -34,7 +34,7 @@ const TIERS = [
   },
   {
     id: 'practice-cohort',
-    stripePriceId: 'price_REPLACE_TIER2',
+    stripeLink: process.env.NEXT_PUBLIC_STRIPE_LINK_TIER2,
     label: 'Tier 2',
     name: 'Practice Cohort',
     tagline: 'For readers who want to move from insight into practice.',
@@ -55,7 +55,7 @@ const TIERS = [
   },
   {
     id: 'deep-work-circle',
-    stripePriceId: 'price_REPLACE_TIER3',
+    stripeLink: process.env.NEXT_PUBLIC_STRIPE_LINK_TIER3,
     label: 'Tier 3',
     name: 'Deep Work Circle',
     tagline: 'For readers ready for personal support while engaging the deeper material.',
@@ -73,7 +73,7 @@ const TIERS = [
   },
   {
     id: 'founding-patron',
-    stripePriceId: 'price_REPLACE_TIER4',
+    stripeLink: process.env.NEXT_PUBLIC_STRIPE_LINK_TIER4,
     label: 'Tier 4',
     name: 'Founding Patron Circle',
     tagline: 'For those who want to help steward this work into the world.',
@@ -102,39 +102,14 @@ const LEARNS = [
 ];
 
 /* ─────────────────────────────────────────────
-   CHECKOUT HANDLER
-───────────────────────────────────────────── */
-async function startCheckout(priceId: string, coupon?: string) {
-  const res = await fetch('/api/interest-list/checkout/book', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ priceId, coupon }),
-  });
-  if (!res.ok) throw new Error('Checkout failed');
-  const { url } = await res.json();
-  window.location.href = url;
-}
-
-/* ─────────────────────────────────────────────
    PAGE
+   Each tier's CTA is a direct link to its Stripe
+   Payment Link. Checkout, payment, and the redirect
+   to the thank-you page all happen on Stripe; the
+   confirmation + notification emails are sent by the
+   Stripe webhook (app/api/stripe/webhook).
 ───────────────────────────────────────────── */
 export default function BuiltThisWayContent() {
-  const [loading, setLoading] = useState<string | null>(null);
-  const [coupon, setCoupon] = useState('');
-  const [couponOpen, setCouponOpen] = useState(false);
-  const [err, setErr] = useState('');
-
-  async function handleJoin(tier: typeof TIERS[number]) {
-    setErr('');
-    setLoading(tier.id);
-    try {
-      await startCheckout(tier.stripePriceId, coupon.trim() || undefined);
-    } catch {
-      setErr('Something went wrong. Please try again.');
-      setLoading(null);
-    }
-  }
-
   return (
     <main style={{ fontFamily: 'var(--font-sans)' }}>
 
@@ -450,74 +425,6 @@ export default function BuiltThisWayContent() {
             </p>
           </div>
 
-          {/* Member coupon code input */}
-          <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-            <button
-              onClick={() => setCouponOpen(o => !o)}
-              style={{
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.375rem',
-                fontSize: 'var(--text-small)',
-                color: 'var(--color-brand-blue)',
-                fontWeight: 600,
-                textDecoration: 'underline',
-              }}
-            >
-              <Lock style={{ width: 14, height: 14 }} />
-              Have a Member ID or coupon code?
-            </button>
-            {couponOpen && (
-              <div style={{ marginTop: '0.75rem', display: 'flex', justifyContent: 'center', gap: '0.5rem' }}>
-                <input
-                  type="text"
-                  placeholder="Enter your code"
-                  value={coupon}
-                  onChange={e => setCoupon(e.target.value)}
-                  style={{
-                    padding: '0.625rem 1rem',
-                    borderRadius: '9999px',
-                    border: '1px solid var(--color-brand-border)',
-                    fontSize: 'var(--text-small)',
-                    outline: 'none',
-                    width: '220px',
-                    fontFamily: 'var(--font-sans)',
-                  }}
-                />
-                <button
-                  onClick={() => setCouponOpen(false)}
-                  style={{
-                    padding: '0.625rem 1.25rem',
-                    borderRadius: '9999px',
-                    backgroundColor: 'var(--color-brand-navy)',
-                    color: '#fff',
-                    border: 'none',
-                    cursor: 'pointer',
-                    fontSize: 'var(--text-small)',
-                    fontWeight: 600,
-                    fontFamily: 'var(--font-sans)',
-                  }}
-                >
-                  Apply
-                </button>
-              </div>
-            )}
-            {coupon && !couponOpen && (
-              <p style={{ fontSize: 'var(--text-xs)', color: 'var(--color-brand-sienna)', marginTop: '0.5rem', fontWeight: 600 }}>
-                ✓ Code "{coupon}" will be applied at checkout
-              </p>
-            )}
-          </div>
-
-          {err && (
-            <p style={{ textAlign: 'center', color: 'var(--color-brand-sienna)', marginBottom: '1.5rem', fontWeight: 600 }}>
-              {err}
-            </p>
-          )}
-
           {/* Tier grid */}
           <div style={{
             display: 'grid',
@@ -528,7 +435,7 @@ export default function BuiltThisWayContent() {
             {TIERS.map(tier => {
               const Icon = tier.icon;
               const isHighlight = tier.highlight;
-              const isLoading = loading === tier.id;
+              const hasLink = Boolean(tier.stripeLink);
               return (
                 <div
                   key={tier.id}
@@ -661,30 +568,53 @@ export default function BuiltThisWayContent() {
                     </p>
                   )}
 
-                  {/* CTA */}
-                  <button
-                    onClick={() => handleJoin(tier)}
-                    disabled={!!loading}
-                    style={{
-                      marginTop: '1.75rem',
-                      width: '100%',
-                      padding: '0.9375rem',
-                      borderRadius: '9999px',
-                      fontFamily: 'var(--font-sans)',
-                      fontSize: 'var(--text-small)',
-                      fontWeight: 700,
-                      letterSpacing: '0.06em',
-                      textTransform: 'uppercase',
-                      border: 'none',
-                      cursor: loading ? 'not-allowed' : 'pointer',
-                      opacity: loading && !isLoading ? 0.6 : 1,
-                      backgroundColor: isHighlight ? 'var(--color-brand-sienna)' : 'var(--color-brand-navy)',
-                      color: '#ffffff',
-                      transition: 'background-color 0.2s, opacity 0.2s',
-                    }}
-                  >
-                    {isLoading ? 'Redirecting…' : 'Join the Launch Team'}
-                  </button>
+                  {/* CTA — direct link to this tier's Stripe Payment Link */}
+                  {hasLink ? (
+                    <a
+                      href={tier.stripeLink}
+                      style={{
+                        marginTop: '1.75rem',
+                        display: 'block',
+                        textAlign: 'center',
+                        textDecoration: 'none',
+                        width: '100%',
+                        padding: '0.9375rem',
+                        borderRadius: '9999px',
+                        fontFamily: 'var(--font-sans)',
+                        fontSize: 'var(--text-small)',
+                        fontWeight: 700,
+                        letterSpacing: '0.06em',
+                        textTransform: 'uppercase',
+                        cursor: 'pointer',
+                        backgroundColor: isHighlight ? 'var(--color-brand-sienna)' : 'var(--color-brand-navy)',
+                        color: '#ffffff',
+                        transition: 'background-color 0.2s',
+                      }}
+                    >
+                      Join the Launch Team
+                    </a>
+                  ) : (
+                    <span
+                      style={{
+                        marginTop: '1.75rem',
+                        display: 'block',
+                        textAlign: 'center',
+                        width: '100%',
+                        padding: '0.9375rem',
+                        borderRadius: '9999px',
+                        fontFamily: 'var(--font-sans)',
+                        fontSize: 'var(--text-small)',
+                        fontWeight: 700,
+                        letterSpacing: '0.06em',
+                        textTransform: 'uppercase',
+                        cursor: 'not-allowed',
+                        backgroundColor: isHighlight ? 'rgba(255,255,255,0.15)' : 'var(--color-brand-warm-gray)',
+                        color: isHighlight ? 'rgba(255,255,255,0.6)' : 'var(--color-brand-text-light)',
+                      }}
+                    >
+                      Coming soon
+                    </span>
+                  )}
                 </div>
               );
             })}
@@ -697,7 +627,7 @@ export default function BuiltThisWayContent() {
             color: 'var(--color-brand-text-light)',
             marginTop: '2rem',
           }}>
-            Secure checkout powered by Stripe. Members: enter your Client ID above to apply your discount.
+            Secure checkout powered by Stripe.
           </p>
         </div>
       </section>
