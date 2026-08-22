@@ -204,9 +204,22 @@ export function buildMetadata(
   };
 }
 
+// A CMS lookup should never be able to hold a page render open indefinitely.
+const CMS_TIMEOUT_MS = 10_000;
+
 export async function getPageBySlug(slug: string): Promise<PageData | null> {
   const base = process.env.NEXT_PUBLIC_DIRECTUS_URL;
   const token = process.env.DIRECTUS_STATIC_TOKEN;
+
+  // With no CMS configured there is nothing to fetch. Bail before building a
+  // URL, because `${undefined}/items/pages` is a relative path: during static
+  // generation that resolves against the deployment itself and the build
+  // worker waits on a server that isn't listening yet, which reads as a
+  // 60-second timeout rather than a clear error. Callers already fall back to
+  // their hardcoded content when this returns null.
+  // (site-settings.ts, testimonials.ts, blog.ts and homepage.ts all guard the
+  // same way; this one was missed.)
+  if (!base) return null;
 
   const url =
     `${base}/items/pages` +
@@ -220,6 +233,9 @@ export async function getPageBySlug(slug: string): Promise<PageData | null> {
     const res = await fetch(url, {
       headers: { Authorization: `Bearer ${token}` },
       next: { tags: ['cms-pages'] },
+      // A slow or unreachable CMS should degrade to fallback copy, not stall
+      // the build. Directus lives on a droplet that is due to move accounts.
+      signal: AbortSignal.timeout(CMS_TIMEOUT_MS),
     });
     if (!res.ok) return null;
     const json = await res.json();
