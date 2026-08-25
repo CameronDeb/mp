@@ -14,6 +14,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { handleBookPurchase, type BookPurchase } from '@/lib/book-launch';
+import { handlePowerToolsPurchase } from '@/lib/fulfilment';
+import { PRODUCTS_BY_KEY } from '@/lib/products';
 
 // Stripe signature verification needs the raw request body and Node crypto.
 export const runtime = 'nodejs';
@@ -57,6 +59,23 @@ export async function POST(req: NextRequest) {
   const email = session.customer_details?.email ?? null;
   if (!email) {
     console.error('[stripe/webhook] checkout.session.completed with no customer email:', session.id);
+    return NextResponse.json({ received: true });
+  }
+
+  // Power Tools sessions are created by /api/checkout and carry the product key
+  // in metadata, so fulfilment is unambiguous — no parsing of line item text.
+  // Anything without that key is a book-launch payment link and follows the
+  // original path.
+  const productKey = session.metadata?.product_key;
+  if (productKey && PRODUCTS_BY_KEY[productKey]) {
+    await handlePowerToolsPurchase({
+      productKey,
+      email,
+      name: session.customer_details?.name ?? null,
+      amountTotal: session.amount_total,
+      currency: session.currency,
+      sessionId: session.id,
+    });
     return NextResponse.json({ received: true });
   }
 

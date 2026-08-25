@@ -47,9 +47,11 @@ export function AboutMark({
                 fill
                 sizes="(max-width: 768px) 100vw, 40vw"
                 className="object-cover"
-                /* Source is a 2:1 landscape with Mark right-of-centre; pull the
-                   crop toward him so the 4:5 frame doesn't cut him off. */
-                style={{ objectPosition: '70% center' }}
+                /* Source is a 2500x1230 landscape with Mark far right of centre.
+                   The 4:5 frame is 984px wide, so centring him on x~1810 puts
+                   the crop window at 87% along the 1516px of travel. At the old
+                   70% he sat right of centre with an elbow cut off. */
+                style={{ objectPosition: '87% center' }}
               />
             </div>
 
