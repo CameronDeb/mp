@@ -7,8 +7,28 @@ import { renderNewsletterHTML, type NewsletterPostSummary, type NewsletterTempla
 const DIRECTUS_URL = process.env.NEXT_PUBLIC_DIRECTUS_URL || 'http://localhost:8055';
 const DIRECTUS_TOKEN = process.env.DIRECTUS_STATIC_TOKEN;
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://mp-web-psi.vercel.app';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://drmarkpirtle.com';
 const PHYSICAL_ADDRESS = process.env.NEWSLETTER_PHYSICAL_ADDRESS || 'ADDRESS NOT SET — required by CAN-SPAM, set NEWSLETTER_PHYSICAL_ADDRESS';
+
+/**
+ * CAN-SPAM requires a real postal address in every commercial send. The env var
+ * has shipped as a placeholder before, and a placeholder reaching the full list
+ * is both a legal problem and an embarrassing one, so a real send is blocked
+ * until it is set. Test sends are deliberately exempt — seeing the footer as it
+ * currently stands is the point of a test.
+ */
+export function physicalAddressProblem(): string | null {
+  const addr = (process.env.NEWSLETTER_PHYSICAL_ADDRESS || '').trim();
+  if (!addr) return 'NEWSLETTER_PHYSICAL_ADDRESS is not set.';
+  if (/replace|not set|your address|placeholder|xxx/i.test(addr)) {
+    return `NEWSLETTER_PHYSICAL_ADDRESS still looks like a placeholder ("${addr}").`;
+  }
+  // A usable postal address has a number and some words. Catches "TBD" etc.
+  if (!/\d/.test(addr) || addr.length < 12) {
+    return `NEWSLETTER_PHYSICAL_ADDRESS does not look like a postal address ("${addr}").`;
+  }
+  return null;
+}
 
 interface DirectusNewsletterItem {
   id: number;

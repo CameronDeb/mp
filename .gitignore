@@ -36,6 +36,12 @@ yarn-error.log*
 # vercel
 .vercel
 
+# Paid Power Tools product files (audio, workbook PDFs). These are the goods
+# customers pay for — they must never enter git history, and they are far too
+# large for the repo. They belong in private object storage, served through
+# time-limited signed download links after a Stripe purchase.
+/power-tool-files/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

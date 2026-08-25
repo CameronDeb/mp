@@ -9,11 +9,15 @@ const DIRECTUS_TOKEN = process.env.DIRECTUS_STATIC_TOKEN;
 const MAILGUN_API_KEY = process.env.MAILGUN_API_KEY;
 const MAILGUN_DOMAIN = process.env.MAILGUN_DOMAIN;
 const MAILGUN_FROM = process.env.MAILGUN_FROM || 'Dr. Mark Pirtle <newsletter@mg.drmarkpirtle.com>';
+// The From address has to live on MAILGUN_DOMAIN for SPF/DKIM alignment, which
+// makes it an address nobody monitors. Replies are redirected to a real inbox.
+const NEWSLETTER_REPLY_TO = process.env.NEWSLETTER_REPLY_TO;
 
 // Mailgun's per-call recipient cap for a single batch send.
-const BATCH_SIZE = 1000;
+const MAILGUN_CALL_CAP = 1000;
 
 interface Subscriber {
+  id: number;
   email: string;
   name: string | null;
 }
@@ -24,11 +28,27 @@ function chunk<T>(arr: T[], size: number): T[][] {
   return out;
 }
 
-async function getSubscribedRecipients(): Promise<Subscriber[]> {
-  const res = await fetch(
-    `${DIRECTUS_URL}/items/newsletter_subscribers?filter[status][_eq]=Subscribed&fields=email,name&limit=-1`,
-    { headers: DIRECTUS_TOKEN ? { Authorization: `Bearer ${DIRECTUS_TOKEN}` } : {}, cache: 'no-store' }
-  );
+/**
+ * Subscribed recipients ordered by id, optionally starting after a cursor.
+ *
+ * Ordering by id (rather than offset paging) is what makes a multi-day warm-up
+ * safe: new signups always land on higher ids, so they queue up after the
+ * cursor instead of shifting rows into or out of batches that already went out.
+ * Offset paging would silently skip or double-send people whenever the list
+ * changed between batches, which over a four-day warm-up it certainly will.
+ */
+async function getSubscribedRecipients(afterId = 0, limit?: number): Promise<Subscriber[]> {
+  const params = new URLSearchParams({
+    'filter[status][_eq]': 'Subscribed',
+    'filter[id][_gt]': String(afterId),
+    fields: 'id,email,name',
+    sort: 'id',
+    limit: String(limit && limit > 0 ? limit : -1),
+  });
+  const res = await fetch(`${DIRECTUS_URL}/items/newsletter_subscribers?${params}`, {
+    headers: DIRECTUS_TOKEN ? { Authorization: `Bearer ${DIRECTUS_TOKEN}` } : {},
+    cache: 'no-store',
+  });
   if (!res.ok) {
     throw new Error(`Failed to fetch subscribers (${res.status}): ${await res.text()}`);
   }
@@ -36,25 +56,80 @@ async function getSubscribedRecipients(): Promise<Subscriber[]> {
   return json.data;
 }
 
+/** How many Subscribed rows remain strictly after `afterId`. */
+async function countRemaining(afterId: number): Promise<number> {
+  const params = new URLSearchParams({
+    'filter[status][_eq]': 'Subscribed',
+    'filter[id][_gt]': String(afterId),
+    'aggregate[count]': '*',
+  });
+  const res = await fetch(`${DIRECTUS_URL}/items/newsletter_subscribers?${params}`, {
+    headers: DIRECTUS_TOKEN ? { Authorization: `Bearer ${DIRECTUS_TOKEN}` } : {},
+    cache: 'no-store',
+  });
+  if (!res.ok) return 0;
+  const json = await res.json();
+  return Number(json.data?.[0]?.count ?? 0);
+}
+
+export interface SendOptions {
+  /** Send only this many recipients. Omit to send to the whole remaining list. */
+  batchSize?: number;
+  /** Resume after this subscriber id. Pass the previous batch's `lastId`. */
+  afterId?: number;
+  /** Resolve the recipient set and return it without sending anything. */
+  dryRun?: boolean;
+}
+
 export interface SendResult {
   recipientCount: number;
   messageIds: string[];
+  /** Highest subscriber id in this batch — pass as `afterId` for the next one. */
+  lastId: number;
+  /** Subscribed rows still unsent after this batch. 0 means the send is complete. */
+  remaining: number;
+  dryRun?: boolean;
+  /** Present on a dry run so the operator can eyeball who is about to be mailed. */
+  preview?: string[];
 }
 
-/** Sends `html` to every subscribed recipient in Directus via Mailgun batch sending. */
-export async function sendNewsletterToSubscribers(subject: string, html: string): Promise<SendResult> {
+/**
+ * Sends `html` to subscribed recipients. With no options this mails the entire
+ * list in one go, exactly as before. With `batchSize` it mails one warm-up
+ * cohort and reports the cursor to resume from.
+ */
+export async function sendNewsletterToSubscribers(
+  subject: string,
+  html: string,
+  options: SendOptions = {}
+): Promise<SendResult> {
   if (!MAILGUN_API_KEY || !MAILGUN_DOMAIN) {
     throw new Error('Mailgun not configured — set MAILGUN_API_KEY and MAILGUN_DOMAIN');
   }
 
-  const recipients = await getSubscribedRecipients();
+  const afterId = options.afterId ?? 0;
+  const recipients = await getSubscribedRecipients(afterId, options.batchSize);
+
   if (recipients.length === 0) {
-    return { recipientCount: 0, messageIds: [] };
+    return { recipientCount: 0, messageIds: [], lastId: afterId, remaining: 0 };
+  }
+
+  const lastId = recipients[recipients.length - 1].id;
+
+  if (options.dryRun) {
+    return {
+      recipientCount: recipients.length,
+      messageIds: [],
+      lastId,
+      remaining: await countRemaining(lastId),
+      dryRun: true,
+      preview: recipients.slice(0, 10).map((r) => r.email),
+    };
   }
 
   const messageIds: string[] = [];
 
-  for (const batch of chunk(recipients, BATCH_SIZE)) {
+  for (const batch of chunk(recipients, MAILGUN_CALL_CAP)) {
     const to = batch.map((r) => (r.name ? `${r.name} <${r.email}>` : r.email)).join(',');
     const recipientVariables: Record<string, { name: string }> = {};
     for (const r of batch) {
@@ -67,6 +142,13 @@ export async function sendNewsletterToSubscribers(subject: string, html: string)
     form.append('subject', subject);
     form.append('html', html);
     form.append('recipient-variables', JSON.stringify(recipientVariables));
+    if (NEWSLETTER_REPLY_TO) form.append('h:Reply-To', NEWSLETTER_REPLY_TO);
+    // Gmail and Yahoo expect bulk senders to offer one-click unsubscribe, and
+    // its absence is itself a filtering signal. Mailgun expands
+    // %unsubscribe_url% here the same as in the body, but only while the
+    // domain's unsubscribe tracking is switched on.
+    form.append('h:List-Unsubscribe', '<%unsubscribe_url%>');
+    form.append('h:List-Unsubscribe-Post', 'List-Unsubscribe=One-Click');
 
     const res = await fetch(`https://api.mailgun.net/v3/${MAILGUN_DOMAIN}/messages`, {
       method: 'POST',
@@ -81,7 +163,12 @@ export async function sendNewsletterToSubscribers(subject: string, html: string)
     messageIds.push(json.id);
   }
 
-  return { recipientCount: recipients.length, messageIds };
+  return {
+    recipientCount: recipients.length,
+    messageIds,
+    lastId,
+    remaining: await countRemaining(lastId),
+  };
 }
 
 export interface SimpleEmailOptions {
@@ -124,7 +211,8 @@ export async function sendSimpleEmail(
 
 /** Sends `html` to a single address only — for previewing/testing before a real send. */
 export async function sendTestEmail(to: string, subject: string, html: string): Promise<{ messageId: string }> {
-  return sendSimpleEmail(to, `[TEST] ${subject}`, html);
+  // Mirror the real send's headers so the test previews true deliverability.
+  return sendSimpleEmail(to, `[TEST] ${subject}`, html, { replyTo: NEWSLETTER_REPLY_TO });
 }
 
 /** Sent immediately when someone subscribes via a site form. */
