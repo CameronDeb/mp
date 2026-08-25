@@ -159,6 +159,46 @@ p {
   max-width: 68ch;
 }
 
+/* ── Homepage hero ────────────────────────────────────────────────────────
+   The hero photo is a 2500x1230 landscape with Mark far right of centre, and
+   the desktop layout leans on that: the photo is pinned right and a horizontal
+   scrim darkens the left two thirds behind the text.
+
+   Neither survives a narrow screen. A phone-shaped crop of a very wide photo
+   shows only its right-hand sliver — at 375px that was source x 1999-2500,
+   while Mark's head is at x~1810, so he was cropped out of his own hero. And
+   the scrim's fixed 26.5rem right offset is wider than a phone, collapsing it
+   to zero width and leaving white text on a bright photo.
+
+   So below 900px the photo re-centres onto Mark and the scrim becomes a
+   full-width vertical wash instead. */
+.hero-card    { min-height: 52rem; }
+.hero-content { min-height: 47rem; }
+.hero-photo   { object-position: right center; }
+.hero-scrim {
+  position: absolute;
+  top: 0; bottom: 0; left: 0; right: 26.5rem;
+  background: linear-gradient(90deg,
+    rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.90) 55%, rgba(0,0,0,0.38) 70%,
+    rgba(0,0,0,0.05) 82%, rgba(0,0,0,0) 90%);
+}
+
+@media (max-width: 900px) {
+  .hero-card    { min-height: 42rem; }
+  .hero-content { min-height: 36rem; }
+  .hero-photo   { object-position: 74% center; }
+  .hero-scrim {
+    right: 0;
+    background: linear-gradient(180deg,
+      rgba(0,0,0,0.86) 0%, rgba(0,0,0,0.74) 50%, rgba(0,0,0,0.60) 100%);
+  }
+}
+
+@media (max-width: 560px) {
+  .hero-card    { min-height: 36rem; }
+  .hero-content { min-height: 30rem; }
+}
+
 /* Italic glyphs lean right, so the last letter of an italic phrase optically
    collides with the roman word after it — "Built This Way" + "was" reads as
    "Built This Waywas" even though the space is present in the markup. Adding a

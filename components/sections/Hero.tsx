@@ -18,11 +18,12 @@ export function Hero({
     <section style={{ backgroundColor: 'var(--color-brand-cream)', paddingTop: '6.25rem', paddingBottom: '2rem' }}>
       <div className="container">
         {/* Hero image card */}
-        <div style={{
+        {/* Sizing, photo crop and scrim are all viewport-dependent, so they
+            live in globals.css under .hero-* rather than inline here. */}
+        <div className="hero-card" style={{
           position: 'relative',
           borderRadius: '0.75rem',
           overflow: 'hidden',
-          minHeight: '52rem', // 832px (752 content + 80 spacer)
           display: 'flex',
           flexDirection: 'column',
         }}>
@@ -32,27 +33,21 @@ export function Hero({
             src={image}
             alt="Dr. Mark Pirtle"
             fill
-            className="object-cover"
-            style={{ objectPosition: 'right center' }}
+            className="object-cover hero-photo"
             priority
           />
 
-          {/* Left-to-right gradient overlay */}
-          <div style={{
-            position: 'absolute',
-            top: 0, right: '26.5rem', bottom: 0, left: 0, // covers ~66% from left
-            background: 'linear-gradient(90deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.90) 55%, rgba(0,0,0,0.38) 70%, rgba(0,0,0,0.05) 82%, rgba(0,0,0,0) 90%)',
-          }} />
+          {/* Scrim behind the text — horizontal on desktop, vertical on mobile */}
+          <div className="hero-scrim" />
 
           {/* Content */}
-          <div style={{
+          <div className="hero-content" style={{
             position: 'relative',
             display: 'flex',
             flexDirection: 'column',
             gap: '2.2rem',
             padding: 'clamp(1.5rem, 3vw, 1.875rem) clamp(2rem, 10vw, 7.875rem) clamp(4rem, 8vw, 7rem) clamp(1.5rem, 4vw, 3.75rem)',
             flex: 1,
-            minHeight: '47rem',
           }}>
 
             <h1 style={{
