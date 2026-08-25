@@ -23,10 +23,9 @@ const LEARNS = [
    their Stripe Payment Links are gone; recover them
    from git if fundraising ever returns.
 
-   The hero scrolls to the launch team pitch, and the
-   pitch's own CTA is the action. Mark still owes us
-   the launch team copy and a decision on what joining
-   actually does, so /contact is the interim target.
+   The hero scrolls to the launch team pitch, whose own
+   CTA goes to /launch-team — the opt-in page built
+   from Mark's BTWLaunchTeamWebpageCopy doc.
 ───────────────────────────────────────────── */
 export default function BuiltThisWayContent() {
   return (
@@ -328,7 +327,7 @@ export default function BuiltThisWayContent() {
             bringing its ideas into your daily life.
           </p>
 
-          <Link href="/contact" className="btn-primary" style={{ fontSize: '1rem', padding: '1rem 2.5rem' }}>
+          <Link href="/launch-team" className="btn-primary" style={{ fontSize: '1rem', padding: '1rem 2.5rem' }}>
             Join the Launch Team <ArrowRight className="inline w-4 h-4 ml-1" />
           </Link>
         </div>
@@ -427,7 +426,7 @@ export default function BuiltThisWayContent() {
             ))}
           </div>
 
-          <Link href="/contact" className="btn-primary" style={{ fontSize: '1rem', padding: '1rem 2.75rem' }}>
+          <Link href="/launch-team" className="btn-primary" style={{ fontSize: '1rem', padding: '1rem 2.75rem' }}>
             Join the Launch Team
           </Link>
         </div>
