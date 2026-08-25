@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
 import type { HomepageCopy } from '@/lib/homepage';
 
@@ -15,36 +16,23 @@ export function BuiltThisWay({ copy }: { copy: HomepageCopy }) {
         alignItems: 'center',
       }}>
 
-        {/* Book cover placeholder */}
-        <div style={{
-          aspectRatio: '3/4',
-          backgroundColor: 'var(--color-brand-sienna)',
-          borderRadius: '1rem',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          maxWidth: '320px',
-        }}>
-          <div style={{ textAlign: 'center', padding: '2rem' }}>
-            <p style={{
-              fontSize: 'var(--text-xs)',
-              fontWeight: 700,
-              letterSpacing: '0.1em',
-              textTransform: 'uppercase',
-              color: 'rgba(255,255,255,0.6)',
-              marginBottom: '1rem',
-            }}>
-              Book Cover
-            </p>
-            <p style={{
-              fontSize: '1.25rem',
-              fontWeight: 600,
-              color: '#ffffff',
-              lineHeight: 1.3,
-            }}>
-              Built This Way
-            </p>
-          </div>
+        {/* Book cover. Centred within its grid column so it sits under the
+            heading rather than hard against the left gutter. */}
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <Image
+            src="/images/book-cover.webp"
+            alt="Built This Way: Why Painful Patterns Repeat and How to Change Them, by Dr. Mark Pirtle"
+            width={640}
+            height={986}
+            sizes="(max-width: 1024px) 60vw, 320px"
+            style={{
+              width: '100%',
+              maxWidth: '320px',
+              height: 'auto',
+              borderRadius: '0.5rem',
+              boxShadow: 'var(--shadow-premium)',
+            }}
+          />
         </div>
 
         {/* Content */}

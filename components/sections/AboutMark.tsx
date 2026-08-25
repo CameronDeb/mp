@@ -17,8 +17,10 @@ export function AboutMark({
       <div className="container">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
 
-          {/* Left — photo */}
-          <div style={{ position: 'relative' }}>
+          {/* Left — photo. Capped and centred in its column: at wide viewports
+              the column outgrows the portrait's useful size, and left-aligning
+              it left an obvious gap between photo and copy. */}
+          <div style={{ position: 'relative', width: '100%', maxWidth: '26rem', margin: '0 auto' }}>
             <div
               style={{
                 aspectRatio: '4/5',

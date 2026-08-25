@@ -159,7 +159,12 @@ p {
   max-width: 68ch;
 }
 
-em { font-style: italic; }
+/* Italic glyphs lean right, so the last letter of an italic phrase optically
+   collides with the roman word after it — "Built This Way" + "was" reads as
+   "Built This Waywas" even though the space is present in the markup. Adding a
+   character would produce a real double space; this restores the optical gap
+   instead. Small enough to be invisible before punctuation. */
+em { font-style: italic; padding-right: 0.08em; }
 
 /* ============================================
    COMPONENTS — must use @layer so Tailwind

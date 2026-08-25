@@ -26,12 +26,14 @@ function buildNavigation(blogCategories: HeaderCategory[]) {
     {
       name: 'Power Tools',
       href: '/power-tools',
+      // Order set by Mark, Aug 2026.
       dropdown: [
-        { name: 'All Power Tools',    href: '/power-tools',                      description: 'Classes, workbooks, meditations' },
-        { name: 'Online Classes',     href: '/power-tools#online-classes',       description: 'Live cohort classes' },
-        { name: 'Workbooks',          href: '/power-tools#workbooks',            description: 'Work through it on the page' },
+        { name: 'All Power Tools',     href: '/power-tools',                     description: 'Classes, workbooks, meditations' },
+        { name: 'Built This Way',      href: '/power-tools/book',                description: 'The book' },
+        { name: 'Workbooks',           href: '/power-tools#workbooks',           description: 'Work through it on the page' },
+        { name: 'SAAQ',                href: '/consultation',                    description: 'The leadership assessment' },
+        { name: 'Online Classes',      href: '/power-tools#online-classes',      description: 'Live cohort classes' },
         { name: 'Meditation Programs', href: '/power-tools#meditation-programs', description: 'Guided practice, at your own pace' },
-        { name: 'Built This Way',     href: '/power-tools/book',                 description: 'The book' },
       ],
     },
     {
@@ -53,7 +55,7 @@ export function Header({
   logo = '/logos/logo-2026.png',
   categories = [],
   ctaLabel = 'Preorder the Book',
-  ctaUrl = '/power-tools/book',
+  ctaUrl = '/power-tools',
 }: {
   logo?: string;
   categories?: HeaderCategory[];

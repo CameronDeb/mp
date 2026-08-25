@@ -48,7 +48,9 @@ export const COPY_FALLBACK: SiteCopy = {
   newsletterButtonLabel: 'Subscribe',
   newsletterPrivacyLine: 'No spam. Unsubscribe anytime.',
   navCtaLabel: 'Preorder the Book',
-  navCtaUrl: '/power-tools/book',
+  // Mark, Aug 2026: point this at the shop, "where customers can pre-order",
+  // rather than at the book's own landing page.
+  navCtaUrl: '/power-tools',
 };
 
 type SettingsRow = {

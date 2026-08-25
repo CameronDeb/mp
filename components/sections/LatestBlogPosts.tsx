@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { Calendar, ArrowRight, Clock } from 'lucide-react';
 import type { BlogPost } from '@/lib/blog';
 import type { HomepageCopy } from '@/lib/homepage';
@@ -84,7 +85,9 @@ export function LatestBlogPosts({
                 e.currentTarget.style.boxShadow = 'var(--shadow-card)';
               }}
             >
-              {/* Image placeholder */}
+              {/* Post thumbnail. Every post carries a featured_image in
+                  Directus; this slot used to render a flat off-white block and
+                  ignore it. Falls back to that block when an image is absent. */}
               <div
                 style={{
                   height: '11rem',
@@ -93,16 +96,37 @@ export function LatestBlogPosts({
                   display: 'flex',
                   alignItems: 'flex-end',
                   padding: '1rem',
+                  overflow: 'hidden',
                 }}
               >
+                {post.featured_image && (
+                  <>
+                    <Image
+                      src={post.featured_image}
+                      alt=""
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      style={{ objectFit: 'cover' }}
+                    />
+                    {/* Scrim so the category pill stays legible on any image. */}
+                    <div
+                      style={{
+                        position: 'absolute',
+                        inset: 0,
+                        background: 'linear-gradient(to top, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.05) 45%, transparent 70%)',
+                      }}
+                    />
+                  </>
+                )}
                 <span
                   style={{
+                    position: 'relative',
                     fontSize: 'var(--text-xs)',
                     fontWeight: 700,
                     letterSpacing: '0.08em',
                     textTransform: 'uppercase' as const,
                     color: 'var(--color-brand-sienna)',
-                    backgroundColor: 'rgba(192,82,42,0.1)',
+                    backgroundColor: post.featured_image ? 'rgba(255,255,255,0.92)' : 'rgba(192,82,42,0.1)',
                     border: '1px solid rgba(192,82,42,0.2)',
                     padding: '0.25rem 0.625rem',
                     borderRadius: '9999px',

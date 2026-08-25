@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Play, Volume2, ChevronLeft, ChevronRight } from 'lucide-react';
-import { FALLBACK_TESTIMONIALS, type Testimonial, type TestimonialType } from '@/lib/testimonials';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { FALLBACK_TESTIMONIALS, type Testimonial } from '@/lib/testimonials';
 
 function Initials({ name }: { name: string }) {
   return (
@@ -15,81 +15,18 @@ function Initials({ name }: { name: string }) {
   );
 }
 
-function TypeBadge({ type }: { type: TestimonialType }) {
-  const config = {
-    video: { label: 'Video', icon: Play, color: 'rgba(192,82,42,0.12)', border: 'rgba(192,82,42,0.3)', text: 'var(--color-brand-sienna)' },
-    audio: { label: 'Audio', icon: Volume2, color: 'rgba(26,26,26,0.08)', border: 'rgba(26,26,26,0.2)', text: 'var(--color-brand-text)' },
-    text: { label: 'Written', icon: null, color: 'rgba(26,26,26,0.06)', border: 'rgba(26,26,26,0.15)', text: 'var(--color-brand-text-muted)' },
-  }[type];
-
-  const Icon = config.icon;
-
+function TypeBadge() {
   return (
     <span
       className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wider"
-      style={{ backgroundColor: config.color, border: `1px solid ${config.border}`, color: config.text }}
+      style={{
+        backgroundColor: 'rgba(26,26,26,0.06)',
+        border: '1px solid rgba(26,26,26,0.15)',
+        color: 'var(--color-brand-text-muted)',
+      }}
     >
-      {Icon && <Icon className="w-3 h-3" />}
-      {config.label}
+      Written
     </span>
-  );
-}
-
-function VideoCard({ t, onClick }: { t: Testimonial; onClick: () => void }) {
-  return (
-    <div className="card flex flex-col h-full">
-      {/* Thumbnail */}
-      <div
-        className="relative w-full aspect-video flex items-center justify-center cursor-pointer group"
-        style={{ backgroundColor: 'var(--color-brand-navy)' }}
-        onClick={onClick}
-      >
-        {t.thumbnail ? (
-          <img src={t.thumbnail} alt={t.name} className="w-full h-full object-cover" />
-        ) : (
-          <div
-            className="absolute inset-0"
-            style={{
-              background: 'linear-gradient(135deg, #1a1a1a 0%, #2d1a0e 100%)',
-            }}
-          />
-        )}
-        {/* Play button */}
-        <div
-          className="relative z-10 w-14 h-14 rounded-full flex items-center justify-center transition-transform duration-200 group-hover:scale-110"
-          style={{ backgroundColor: 'var(--color-brand-sienna)' }}
-        >
-          <Play className="w-6 h-6 text-white ml-0.5" />
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className="p-6 flex flex-col flex-1">
-        <div className="mb-3">
-          <TypeBadge type="video" />
-        </div>
-        <blockquote
-          className="flex-1 mb-6 italic"
-          style={{ fontSize: '1rem', color: 'var(--color-brand-text)', lineHeight: 1.75 }}
-        >
-          "{t.quote}"
-        </blockquote>
-        <div className="flex items-center gap-3">
-          <Initials name={t.name} />
-          <div>
-            <div style={{ fontWeight: 600, fontSize: 'var(--text-small)', color: 'var(--color-brand-text)' }}>
-              {t.name}
-            </div>
-            <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-brand-text-muted)' }}>
-              {t.title}{t.company ? `, ${t.company}` : ''}
-            </div>
-            <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-brand-text-light)' }}>
-              {t.location}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
   );
 }
 
@@ -97,7 +34,7 @@ function TextCard({ t }: { t: Testimonial }) {
   return (
     <div className="card p-6 flex flex-col h-full">
       <div className="mb-3">
-        <TypeBadge type="text" />
+        <TypeBadge />
       </div>
       {/* Large quote mark */}
       <div
@@ -112,73 +49,6 @@ function TextCard({ t }: { t: Testimonial }) {
       >
         {t.quote}
       </blockquote>
-      <div className="flex items-center gap-3 pt-4" style={{ borderTop: '1px solid var(--color-brand-border)' }}>
-        <Initials name={t.name} />
-        <div>
-          <div style={{ fontWeight: 600, fontSize: 'var(--text-small)', color: 'var(--color-brand-text)' }}>
-            {t.name}
-          </div>
-          <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-brand-text-muted)' }}>
-            {t.title}{t.company ? `, ${t.company}` : ''}
-          </div>
-          <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-brand-text-light)', fontStyle: 'italic' }}>
-            {t.location}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function AudioCard({ t }: { t: Testimonial }) {
-  const [playing, setPlaying] = useState(false);
-
-  return (
-    <div className="card p-6 flex flex-col h-full">
-      <div className="mb-3">
-        <TypeBadge type="audio" />
-      </div>
-
-      {/* Audio player bar */}
-      <div
-        className="flex items-center gap-3 p-3 rounded-xl mb-5"
-        style={{ backgroundColor: 'var(--color-brand-off-white)', border: '1px solid var(--color-brand-warm-gray)' }}
-      >
-        <button
-          onClick={() => setPlaying(p => !p)}
-          className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-colors duration-200"
-          style={{ backgroundColor: playing ? 'var(--color-brand-sienna-dark)' : 'var(--color-brand-sienna)' }}
-        >
-          <Volume2 className="w-4 h-4 text-white" />
-        </button>
-        {/* Fake waveform */}
-        <div className="flex items-center gap-0.5 flex-1">
-          {Array.from({ length: 28 }).map((_, i) => (
-            <div
-              key={i}
-              className="rounded-full flex-1"
-              style={{
-                height: `${8 + Math.sin(i * 0.8) * 6 + Math.random() * 4}px`,
-                backgroundColor: playing && i < 10
-                  ? 'var(--color-brand-sienna)'
-                  : 'var(--color-brand-warm-gray)',
-                transition: 'background-color 0.2s',
-              }}
-            />
-          ))}
-        </div>
-        <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-brand-text-muted)', flexShrink: 0 }}>
-          2:34
-        </span>
-      </div>
-
-      <blockquote
-        className="flex-1 mb-6 italic"
-        style={{ fontSize: '1rem', color: 'var(--color-brand-text)', lineHeight: 1.8 }}
-      >
-        "{t.quote}"
-      </blockquote>
-
       <div className="flex items-center gap-3 pt-4" style={{ borderTop: '1px solid var(--color-brand-border)' }}>
         <Initials name={t.name} />
         <div>
@@ -213,7 +83,6 @@ export function Testimonials({
   ctaLabel?: string;
   ctaUrl?: string;
 }) {
-  const [videoModal, setVideoModal] = useState<string | null>(null);
   const [page, setPage] = useState(0);
   const perPage = 3;
   const testimonials = items;
@@ -238,13 +107,14 @@ export function Testimonials({
           </p>
         </div>
 
-        {/* Cards grid */}
+        {/* Cards grid — every testimonial renders as a written card.
+            Mark, Aug 2026: the videos were not footage of the people giving the
+            testimonial, so the video player and the audio card (whose waveform
+            was decorative rather than real) were removed. The quotes themselves
+            are genuine and are all kept. Restore from git if real recordings
+            ever arrive. */}
         <div className="grid md:grid-cols-3 gap-6 mb-10">
-          {visible.map(t => {
-            if (t.type === 'video') return <VideoCard key={t.id} t={t} onClick={() => t.mediaUrl && setVideoModal(t.mediaUrl)} />;
-            if (t.type === 'audio') return <AudioCard key={t.id} t={t} />;
-            return <TextCard key={t.id} t={t} />;
-          })}
+          {visible.map(t => <TextCard key={t.id} t={t} />)}
         </div>
 
         {/* Pagination */}
@@ -316,28 +186,6 @@ export function Testimonials({
         )}
       </div>
 
-      {/* Video Modal */}
-      {videoModal && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          style={{ backgroundColor: 'rgba(0,0,0,0.85)' }}
-          onClick={() => setVideoModal(null)}
-        >
-          <div
-            className="w-full max-w-3xl rounded-2xl overflow-hidden"
-            onClick={e => e.stopPropagation()}
-          >
-            <div className="aspect-video">
-              <iframe
-                src={videoModal.replace('vimeo.com/', 'player.vimeo.com/video/') + '?autoplay=1'}
-                className="w-full h-full"
-                allow="autoplay; fullscreen"
-                allowFullScreen
-              />
-            </div>
-          </div>
-        </div>
-      )}
     </section>
   );
 }

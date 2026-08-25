@@ -1,97 +1,11 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   CheckCircle, ArrowRight, BookOpen, Users,
   Heart, Star, Sparkles,
 } from 'lucide-react';
 
-/* ─────────────────────────────────────────────
-   TIER DATA
-   Each tier links straight to its Stripe Payment
-   Link. Paste the four URLs into .env.local as
-   NEXT_PUBLIC_STRIPE_LINK_TIER1..4 — a tier with
-   no link renders a disabled "Coming soon" button
-   instead of a dead checkout.
-───────────────────────────────────────────── */
-const TIERS = [
-  {
-    id: 'founding-reader',
-    stripeLink: process.env.NEXT_PUBLIC_STRIPE_LINK_TIER1,
-    label: 'Tier 1',
-    name: 'Founding Reader Circle',
-    tagline: 'For readers who want the book and a simple way to begin practicing the work.',
-    price: 97,
-    highlight: false,
-    icon: BookOpen,
-    iconColor: '#3D8DAE',
-    includes: [
-      'Personally signed copy of Built This Way',
-      '13-Month Guided Meditation Program',
-      '44 guided meditations',
-      'Complete meditation instruction manual',
-      'Meditation Starter PDF: Begin at the Beginning',
-      'Recognition as a Founding Reader supporting the book\'s launch',
-    ],
-  },
-  {
-    id: 'practice-cohort',
-    stripeLink: process.env.NEXT_PUBLIC_STRIPE_LINK_TIER2,
-    label: 'Tier 2',
-    name: 'Practice Cohort',
-    tagline: 'For readers who want to move from insight into practice.',
-    price: 297,
-    highlight: true,
-    icon: Users,
-    iconColor: '#c0522a',
-    badge: 'Most Popular',
-    includes: [
-      'Everything in the Founding Reader Circle',
-      'Live 6-week online class',
-      'Weekly teaching and guided practice',
-      'Real-life application of the book\'s core ideas',
-      'Live Q&A with Dr. Mark Pirtle',
-      'Session recordings for replay',
-    ],
-    note: 'This is not a book club. It is a practice space for people who want to live the work.',
-  },
-  {
-    id: 'deep-work-circle',
-    stripeLink: process.env.NEXT_PUBLIC_STRIPE_LINK_TIER3,
-    label: 'Tier 3',
-    name: 'Deep Work Circle',
-    tagline: 'For readers ready for personal support while engaging the deeper material.',
-    price: 797,
-    highlight: false,
-    icon: Heart,
-    iconColor: '#a04420',
-    includes: [
-      'Everything in the Practice Cohort',
-      'Three 50-minute private shadow work sessions with Dr. Mark Pirtle',
-      'Sessions scheduled over several months to allow integration',
-      'Focus on working skillfully with pain, patterns, and developmental edges',
-    ],
-    note: 'This tier is for people ready to engage their inner work with care, honesty, and support.',
-  },
-  {
-    id: 'founding-patron',
-    stripeLink: process.env.NEXT_PUBLIC_STRIPE_LINK_TIER4,
-    label: 'Tier 4',
-    name: 'Founding Patron Circle',
-    tagline: 'For those who want to help steward this work into the world.',
-    price: 497,
-    highlight: false,
-    icon: Star,
-    iconColor: '#3D8DAE',
-    includes: [
-      'Everything in the Practice Cohort',
-      'Signed copy of Built This Way',
-      'Founding Patron acknowledgment in the book',
-      'Invitation to a private Patron Circle call',
-      'A handwritten note of gratitude from Mark',
-    ],
-    note: 'Founding Patrons are helping bring this work into the world and signaling that it matters.',
-  },
-] as const;
-
+/** "In Built This Way, readers will learn:" list. */
 const LEARNS = [
   'Why painful patterns repeat even when we understand them',
   'Why insight alone is not enough to create lasting change',
@@ -103,11 +17,16 @@ const LEARNS = [
 
 /* ─────────────────────────────────────────────
    PAGE
-   Each tier's CTA is a direct link to its Stripe
-   Payment Link. Checkout, payment, and the redirect
-   to the thank-you page all happen on Stripe; the
-   confirmation + notification emails are sent by the
-   Stripe webhook (app/api/stripe/webhook).
+   Mark, Aug 2026: "Get rid of all the tiers. I'm not
+   raising money for the book anymore. The CTA should
+   just say JOIN THE LAUNCH TEAM." The paid tiers and
+   their Stripe Payment Links are gone; recover them
+   from git if fundraising ever returns.
+
+   The hero scrolls to the launch team pitch, and the
+   pitch's own CTA is the action. Mark still owes us
+   the launch team copy and a decision on what joining
+   actually does, so /contact is the interim target.
 ───────────────────────────────────────────── */
 export default function BuiltThisWayContent() {
   return (
@@ -171,7 +90,27 @@ export default function BuiltThisWayContent() {
             </em>
           </h1>
 
-          {/* Subheadline */}
+          {/* Book cover, between the headline and the subheadline — Mark, Aug 2026 */}
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '2.5rem' }}>
+            <Image
+              src="/images/book-cover.webp"
+              alt="Built This Way: Why Painful Patterns Repeat and How to Change Them, by Dr. Mark Pirtle"
+              width={640}
+              height={986}
+              priority
+              sizes="(max-width: 640px) 55vw, 260px"
+              style={{
+                width: '100%',
+                maxWidth: '260px',
+                height: 'auto',
+                borderRadius: '0.5rem',
+                boxShadow: 'var(--shadow-premium)',
+              }}
+            />
+          </div>
+
+          {/* Subheadline. The subtitle matches the printed cover: "Why Painful
+              Patterns Repeat", not "Why We Repeat Painful Patterns". */}
           <p style={{
             fontSize: 'clamp(1rem, 1.8vw, 1.2rem)',
             color: 'var(--color-brand-text-muted)',
@@ -179,14 +118,14 @@ export default function BuiltThisWayContent() {
             maxWidth: '60ch',
             margin: '0 auto 2.5rem',
           }}>
-            <em>Built This Way: Why We Repeat Painful Patterns and How to Change Them</em>{' '}
+            <em>Built This Way: Why Painful Patterns Repeat and How to Change Them</em>{' '}
             helps readers understand why old patterns repeat and how awareness, practice,
             integration, and compassion make change possible.
           </p>
 
           {/* CTA */}
           <a
-            href="#tiers"
+            href="#launch-team"
             className="btn-primary"
             style={{ fontSize: '1rem', padding: '1rem 2.5rem' }}
           >
@@ -350,7 +289,7 @@ export default function BuiltThisWayContent() {
       {/* ═══════════════════════════════════════
           LAUNCH TEAM INVITATION
       ═══════════════════════════════════════ */}
-      <section className="section-dark" style={{ padding: 'clamp(3.5rem,7vw,5.5rem) 1.5rem', textAlign: 'center' }}>
+      <section id="launch-team" className="section-dark" style={{ padding: 'clamp(3.5rem,7vw,5.5rem) 1.5rem', textAlign: 'center', scrollMarginTop: '6.25rem' }}>
         <div style={{ maxWidth: '720px', margin: '0 auto' }}>
 
           <Sparkles className="mx-auto mb-4" style={{ color: 'var(--color-brand-sienna-light)', width: 36, height: 36 }} />
@@ -389,246 +328,9 @@ export default function BuiltThisWayContent() {
             bringing its ideas into your daily life.
           </p>
 
-          <a href="#tiers" className="btn-primary" style={{ fontSize: '1rem', padding: '1rem 2.5rem' }}>
-            Choose Your Tier <ArrowRight className="inline w-4 h-4 ml-1" />
-          </a>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════
-          TIER CARDS
-      ═══════════════════════════════════════ */}
-      <section
-        id="tiers"
-        style={{ backgroundColor: 'var(--color-brand-off-white)', padding: 'clamp(3.5rem,7vw,5.5rem) 1.5rem' }}
-      >
-        <div className="container">
-
-          {/* Section header */}
-          <div style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
-            <div className="section-divider" style={{ margin: '0 auto 1rem' }} />
-            <span className="eyebrow">Choose Your Launch Team Tier</span>
-            <h2 style={{
-              fontSize: 'clamp(1.6rem, 3vw, 2.25rem)',
-              fontWeight: 800,
-              color: 'var(--color-brand-text)',
-              marginTop: '0.75rem',
-              marginBottom: '1rem',
-              lineHeight: 1.2,
-            }}>
-              Choose the launch team tier that fits you<br />
-              and help bring <em>Built This Way</em> into the world.
-            </h2>
-            <p style={{ color: 'var(--color-brand-text-muted)', maxWidth: '56ch', margin: '0 auto' }}>
-              Each tier gives you a way to support the book and engage the work at the level that
-              feels right for you.
-            </p>
-          </div>
-
-          {/* Tier grid */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-            gap: '1.5rem',
-            alignItems: 'stretch',
-          }}>
-            {TIERS.map(tier => {
-              const Icon = tier.icon;
-              const isHighlight = tier.highlight;
-              const hasLink = Boolean(tier.stripeLink);
-              return (
-                <div
-                  key={tier.id}
-                  style={{
-                    backgroundColor: isHighlight ? 'var(--color-brand-navy)' : '#ffffff',
-                    border: isHighlight
-                      ? '2px solid var(--color-brand-sienna)'
-                      : '1px solid var(--color-brand-warm-gray)',
-                    borderRadius: '0.75rem',
-                    padding: '2rem',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    position: 'relative',
-                    boxShadow: isHighlight ? 'var(--shadow-premium)' : 'var(--shadow-card)',
-                  }}
-                >
-                  {/* Popular badge */}
-                  {'badge' in tier && tier.badge && (
-                    <div style={{
-                      position: 'absolute',
-                      top: '-12px',
-                      left: '50%',
-                      transform: 'translateX(-50%)',
-                      backgroundColor: 'var(--color-brand-sienna)',
-                      color: '#fff',
-                      fontSize: 'var(--text-xs)',
-                      fontWeight: 700,
-                      letterSpacing: '0.08em',
-                      textTransform: 'uppercase',
-                      padding: '0.3rem 1rem',
-                      borderRadius: '9999px',
-                      whiteSpace: 'nowrap',
-                    }}>
-                      {tier.badge}
-                    </div>
-                  )}
-
-                  {/* Icon + Label */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '1.25rem' }}>
-                    <div style={{
-                      width: 40, height: 40,
-                      borderRadius: '0.5rem',
-                      backgroundColor: isHighlight ? 'rgba(255,255,255,0.1)' : 'rgba(61,141,174,0.08)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    }}>
-                      <Icon style={{ width: 20, height: 20, color: isHighlight ? '#ffffff' : tier.iconColor }} />
-                    </div>
-                    <span style={{
-                      fontSize: 'var(--text-xs)',
-                      fontWeight: 700,
-                      letterSpacing: '0.1em',
-                      textTransform: 'uppercase',
-                      color: isHighlight ? 'rgba(255,255,255,0.55)' : 'var(--color-brand-text-muted)',
-                    }}>
-                      {tier.label}
-                    </span>
-                  </div>
-
-                  {/* Name */}
-                  <h3 style={{
-                    fontSize: '1.25rem',
-                    fontWeight: 800,
-                    color: isHighlight ? '#ffffff' : 'var(--color-brand-text)',
-                    marginBottom: '0.5rem',
-                    lineHeight: 1.25,
-                  }}>
-                    {tier.name}
-                  </h3>
-
-                  {/* Tagline */}
-                  <p style={{
-                    fontSize: 'var(--text-small)',
-                    color: isHighlight ? 'rgba(255,255,255,0.65)' : 'var(--color-brand-text-muted)',
-                    lineHeight: 1.6,
-                    marginBottom: '1.5rem',
-                    fontStyle: 'italic',
-                  }}>
-                    {tier.tagline}
-                  </p>
-
-                  {/* Price */}
-                  <div style={{ marginBottom: '1.75rem' }}>
-                    <span style={{
-                      fontSize: 'clamp(2rem, 3vw, 2.5rem)',
-                      fontWeight: 800,
-                      color: isHighlight ? '#ffffff' : 'var(--color-brand-text)',
-                      lineHeight: 1,
-                    }}>
-                      ${tier.price}
-                    </span>
-                    <span style={{
-                      fontSize: 'var(--text-small)',
-                      color: isHighlight ? 'rgba(255,255,255,0.5)' : 'var(--color-brand-text-light)',
-                      marginLeft: '0.375rem',
-                    }}>
-                      one-time
-                    </span>
-                  </div>
-
-                  {/* Includes */}
-                  <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 auto', display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
-                    {tier.includes.map((item, i) => (
-                      <li key={i} style={{ display: 'flex', gap: '0.625rem', alignItems: 'flex-start' }}>
-                        <CheckCircle style={{
-                          flexShrink: 0, marginTop: '2px',
-                          width: 16, height: 16,
-                          color: isHighlight ? 'var(--color-brand-sienna-light)' : 'var(--color-brand-sienna)',
-                        }} />
-                        <span style={{
-                          fontSize: 'var(--text-small)',
-                          color: isHighlight ? 'rgba(255,255,255,0.8)' : 'var(--color-brand-text)',
-                          lineHeight: 1.55,
-                        }}>
-                          {item}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-
-                  {/* Note */}
-                  {'note' in tier && tier.note && (
-                    <p style={{
-                      fontSize: 'var(--text-xs)',
-                      color: isHighlight ? 'rgba(255,255,255,0.5)' : 'var(--color-brand-text-light)',
-                      marginTop: '1rem',
-                      fontStyle: 'italic',
-                      lineHeight: 1.6,
-                    }}>
-                      {tier.note}
-                    </p>
-                  )}
-
-                  {/* CTA — direct link to this tier's Stripe Payment Link */}
-                  {hasLink ? (
-                    <a
-                      href={tier.stripeLink}
-                      style={{
-                        marginTop: '1.75rem',
-                        display: 'block',
-                        textAlign: 'center',
-                        textDecoration: 'none',
-                        width: '100%',
-                        padding: '0.9375rem',
-                        borderRadius: '9999px',
-                        fontFamily: 'var(--font-sans)',
-                        fontSize: 'var(--text-small)',
-                        fontWeight: 700,
-                        letterSpacing: '0.06em',
-                        textTransform: 'uppercase',
-                        cursor: 'pointer',
-                        backgroundColor: isHighlight ? 'var(--color-brand-sienna)' : 'var(--color-brand-navy)',
-                        color: '#ffffff',
-                        transition: 'background-color 0.2s',
-                      }}
-                    >
-                      Join the Launch Team
-                    </a>
-                  ) : (
-                    <span
-                      style={{
-                        marginTop: '1.75rem',
-                        display: 'block',
-                        textAlign: 'center',
-                        width: '100%',
-                        padding: '0.9375rem',
-                        borderRadius: '9999px',
-                        fontFamily: 'var(--font-sans)',
-                        fontSize: 'var(--text-small)',
-                        fontWeight: 700,
-                        letterSpacing: '0.06em',
-                        textTransform: 'uppercase',
-                        cursor: 'not-allowed',
-                        backgroundColor: isHighlight ? 'rgba(255,255,255,0.15)' : 'var(--color-brand-warm-gray)',
-                        color: isHighlight ? 'rgba(255,255,255,0.6)' : 'var(--color-brand-text-light)',
-                      }}
-                    >
-                      Coming soon
-                    </span>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Stripe trust note */}
-          <p style={{
-            textAlign: 'center',
-            fontSize: 'var(--text-xs)',
-            color: 'var(--color-brand-text-light)',
-            marginTop: '2rem',
-          }}>
-            Secure checkout powered by Stripe.
-          </p>
+          <Link href="/contact" className="btn-primary" style={{ fontSize: '1rem', padding: '1rem 2.5rem' }}>
+            Join the Launch Team <ArrowRight className="inline w-4 h-4 ml-1" />
+          </Link>
         </div>
       </section>
 
@@ -725,9 +427,9 @@ export default function BuiltThisWayContent() {
             ))}
           </div>
 
-          <a href="#tiers" className="btn-primary" style={{ fontSize: '1rem', padding: '1rem 2.75rem' }}>
-            Join the Built This Way Launch Team Today
-          </a>
+          <Link href="/contact" className="btn-primary" style={{ fontSize: '1rem', padding: '1rem 2.75rem' }}>
+            Join the Launch Team
+          </Link>
         </div>
       </section>
 
