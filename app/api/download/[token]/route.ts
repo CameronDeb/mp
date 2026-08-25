@@ -1,13 +1,19 @@
-// Serves a purchased file against a signed, time-limited token.
+// Exchanges a signed download token for a short-lived presigned Spaces URL.
 //
-// The file itself lives in Directus's private "Paid Products" folder, which is
-// 403 to anonymous requests. This route holds the server-side Directus token
-// and streams the bytes through only when the signature and expiry check out,
-// so a link can be forwarded but not forged, and stops working after
-// LINK_TTL_HOURS.
+// The bytes deliberately do not pass through this function. Product audio runs
+// to 100MB+ per track and ~4.4GB in total; proxying it would hit the function's
+// duration limit on slow connections and route every gigabyte through Vercel's
+// billable bandwidth. Instead we verify entitlement here and hand the browser
+// a URL that Spaces serves directly.
+//
+// Two independent lifetimes are at work: our token carries the real
+// entitlement and lasts LINK_TTL_HOURS, while the presigned URL it is
+// exchanged for lasts minutes — long enough to start a download, short enough
+// that a leaked redirect target is worthless.
 
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyDownloadToken, fetchPrivateFile, LINK_TTL_HOURS } from '@/lib/downloads';
+import { verifyDownloadToken, LINK_TTL_HOURS } from '@/lib/downloads';
+import { presignDownload, isStorageConfigured } from '@/lib/storage';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -24,8 +30,8 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ tok
   }
 
   if (!result.ok) {
-    // An expired link is a normal thing to hit — a buyer coming back to an old
-    // email — so it gets its own message and a route back rather than a 403.
+    // An expired link is a normal thing to hit — a buyer returning to an old
+    // email — so it gets its own status and a route back rather than a 403.
     if (result.reason === 'expired') {
       return NextResponse.json(
         {
@@ -38,23 +44,25 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ tok
     return NextResponse.json({ error: 'This download link is not valid.' }, { status: 403 });
   }
 
-  const upstream = await fetchPrivateFile(result.fileId);
-  if (!upstream.ok || !upstream.body) {
-    console.error(`[download] Directus returned ${upstream.status} for file ${result.fileId}`);
+  if (!isStorageConfigured()) {
+    console.error('[download] Spaces is not configured');
+    return NextResponse.json({ error: 'Downloads are not available right now.' }, { status: 503 });
+  }
+
+  let url: string;
+  try {
+    url = await presignDownload(result.key, result.filename);
+  } catch (err) {
+    console.error(`[download] Could not presign ${result.key}:`, err);
     return NextResponse.json(
       { error: 'That file could not be retrieved. Please contact us and we will send it directly.' },
       { status: 502 }
     );
   }
 
-  const headers = new Headers();
-  headers.set('Content-Type', upstream.headers.get('content-type') ?? 'application/octet-stream');
-  const length = upstream.headers.get('content-length');
-  if (length) headers.set('Content-Length', length);
-  // Quote the filename so spaces survive, and strip quotes that would break it.
-  headers.set('Content-Disposition', `attachment; filename="${result.filename.replace(/"/g, '')}"`);
-  // Signed, expiring, and per-buyer: must never be cached by a shared proxy.
-  headers.set('Cache-Control', 'private, no-store');
-
-  return new NextResponse(upstream.body, { status: 200, headers });
+  // 302 rather than 307/308: this is a one-off, non-cacheable handoff, and the
+  // target changes on every request.
+  const res = NextResponse.redirect(url, 302);
+  res.headers.set('Cache-Control', 'private, no-store');
+  return res;
 }
