@@ -1,106 +1,126 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import Image from 'next/image';
-import { PRODUCTS_BY_KEY } from '@/lib/products';
+import { ProductCard, type ProductCardProps } from '@/components/shop/ProductCard';
+import { PRODUCTS_BY_KEY, formatPrice } from '@/lib/products';
 import { isDeliverable } from '@/lib/downloads';
-import { ProductCard, type CardProduct } from '@/components/power-tools/ProductCard';
 
 export const metadata: Metadata = {
-  title: 'Power Tools | Classes, Workbooks & Meditations | Dr. Mark Pirtle',
+  title: 'Power Tools | Classes, Workbooks & Guided Meditations | Dr. Mark Pirtle',
   description:
-    'Power Tools are practical classes, workbooks, guided meditations, books and free tools that help you keep practicing after the first insight.',
+    'Practical classes, workbooks, guided meditations, and free tools that help you keep practicing after the first insight.',
 };
 
 /**
  * The Power Tools shop.
  *
- * Structure follows Mark's "Power Tools Page Diagnosis" and its companion
- * prompt (Aug 2026): a guided shop rather than a catalogue, ordered free tool →
- * book → workbooks → meditations → classes, with the two true bundles featured
- * before the individual products.
+ * Structure and copy follow Mark's PowerToolsPageDiagnosisV3: this used to be a
+ * resource list, and his note was that "a shop has to do more than name what
+ * exists". So the page walks a buyer through free tool → book → workbooks →
+ * meditations → classes, with bundles surfaced up front.
  *
- * Deliberately absent, per those same docs:
- *  - No "Complete Practice Path" bundle. Mark never priced it, and it is the
- *    only offer containing a physical book, which would need shipping.
- *  - No meditation bundle. The Comprehensive Program already contains Learn to
- *    Meditate and the Feel Better Series, so a bundle of the three would be
- *    selling the same audio twice.
- *  - The free reflection tool is never bundled. It stays a lead generator.
- *
- * Prices and availability come from lib/products.ts and the download manifest,
- * so nothing here needs editing when Mark's files land — a product flips from
- * "Coming soon" to buyable as soon as it has files.
+ * Status per card is computed, not hardcoded: a digital product with no files
+ * uploaded yet renders Coming Soon. That is what stops the shop selling
+ * something we cannot deliver.
  */
 
-/** "Best for" lines, from the diagnosis doc's buyer-need column. */
-const BEST_FOR: Record<string, string> = {
-  becoming_skillfullyaware_workbook:
-    'Noticing your patterns sooner and strengthening attention.',
-  unfinished_business_workbook:
-    'Working with shadow, projection, resistance, anger and boundaries.',
-  raising_awareness_workbook:
-    'Expanding perspective, maturity and the ability to respond from a wider view.',
-  power_tools_bundle:
-    'Readers who want to practice the ideas from Built This Way on the page.',
-  feel_better_series:
-    'Stress, reactivity, and returning to steadiness in the body.',
-  learn_to_meditate_series:
-    'Anyone who wants a clear foundation for meditating.',
-  comprehensive_meditation_program:
-    'One complete audio practice library, rather than choosing series by series.',
-  project_skillfullyaware_live_class:
-    'People who want live structure, guidance and accountability.',
-  mindfully_overcoming_addictive_behaviors_live_class:
-    'Working with addictive or compulsive patterns alongside live support.',
-};
+const REFLECTION_TOOL_URL =
+  'https://www.whydidireactthatway.com/?utm_source=drmarkpirtle&utm_medium=powertools&utm_campaign=free_tool';
 
-const BADGES: Record<string, string> = {
-  power_tools_bundle: 'Best value',
-  comprehensive_meditation_program: 'Full library',
-};
-
-function card(key: string): CardProduct {
+/** Builds a card from the catalogue, resolving price and deliverability. */
+function card(
+  key: string,
+  extra: Omit<ProductCardProps, 'title' | 'price' | 'status' | 'includes' | 'productKey' | 'badge'> &
+    Partial<Pick<ProductCardProps, 'badge' | 'title' | 'includes'>>
+): ProductCardProps {
   const p = PRODUCTS_BY_KEY[key];
+  const deliverable = isDeliverable(key, p.digitalDelivery);
   return {
-    ...p,
-    deliverable: isDeliverable(p.key, p.digitalDelivery),
-    bestFor: BEST_FOR[key],
-    badge: BADGES[key],
+    title: extra.title ?? p.name,
+    badge: extra.badge ?? p.category,
+    includes: extra.includes ?? p.includes,
+    price: formatPrice(p.priceCents),
+    productKey: key,
+    status: deliverable ? 'buyable' : 'coming-soon',
+    ...extra,
   };
 }
 
-const CATEGORIES = [
-  { label: 'Free Tool', copy: 'Use one real reaction and experience the work in a few minutes.', href: '#free-tool' },
-  { label: 'Book & Media', copy: 'Understand the framework through the book and companion resources.', href: '#book-media' },
-  { label: 'Workbooks', copy: 'Practice on the page with guided reflection and exercises.', href: '#workbooks' },
-  { label: 'Meditations', copy: 'Guided audio for attention, stress, reactivity and awareness.', href: '#meditation-programs' },
-  { label: 'Classes', copy: 'Learn live with structure, guidance and accountability.', href: '#online-classes' },
-];
-
-function SectionHeading({ id, eyebrow, title, intro }: { id?: string; eyebrow: string; title: string; intro?: string }) {
+function Section({
+  id,
+  eyebrow,
+  heading,
+  intro,
+  background,
+  children,
+}: {
+  id?: string;
+  eyebrow?: string;
+  heading: string;
+  intro?: string;
+  background?: string;
+  children: React.ReactNode;
+}) {
   return (
-    <div id={id} style={{ marginBottom: '2rem', scrollMarginTop: '7rem' }}>
-      <div className="section-divider" />
-      <span className="eyebrow">{eyebrow}</span>
-      <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2.1rem)', fontWeight: 800, color: 'var(--color-brand-text)', margin: '0.75rem 0 0.5rem', lineHeight: 1.2 }}>
-        {title}
-      </h2>
-      {intro && (
-        <p style={{ fontSize: '1.0125rem', lineHeight: 1.7, color: 'var(--color-brand-text-muted)', maxWidth: '62ch', margin: 0 }}>
-          {intro}
-        </p>
-      )}
+    <section
+      id={id}
+      style={{
+        backgroundColor: background ?? '#ffffff',
+        padding: 'clamp(3rem, 6vw, 4.5rem) 1.5rem',
+        scrollMarginTop: '6.25rem',
+      }}
+    >
+      <div className="container" style={{ maxWidth: '72rem' }}>
+        <div style={{ marginBottom: '2.25rem', maxWidth: '54ch' }}>
+          {eyebrow && <span className="eyebrow">{eyebrow}</span>}
+          <h2
+            style={{
+              fontSize: 'clamp(1.5rem, 3vw, 2.1rem)',
+              fontWeight: 800,
+              color: 'var(--color-brand-text)',
+              margin: eyebrow ? '0.75rem 0 0.75rem' : '0 0 0.75rem',
+              lineHeight: 1.2,
+            }}
+          >
+            {heading}
+          </h2>
+          {intro && (
+            <p style={{ fontSize: '1.0625rem', lineHeight: 1.75, color: 'var(--color-brand-text-muted)', margin: 0 }}>
+              {intro}
+            </p>
+          )}
+        </div>
+        {children}
+      </div>
+    </section>
+  );
+}
+
+function Grid({ children, min = '18rem' }: { children: React.ReactNode; min?: string }) {
+  return (
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: `repeat(auto-fit, minmax(min(100%, ${min}), 1fr))`,
+        gap: '1.5rem',
+        alignItems: 'stretch',
+      }}
+    >
+      {children}
     </div>
   );
 }
 
-const GRID: React.CSSProperties = {
-  display: 'grid',
-  gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 17rem), 1fr))',
-  gap: '1.25rem',
-};
+const STARTING_POINTS = [
+  { label: 'Free Tool', purpose: 'Use one real reaction and experience the work in a few minutes.', href: '#free-tool' },
+  { label: 'Book & Media', purpose: 'Understand the framework through the book and companion resources.', href: '#book-media' },
+  { label: 'Workbooks', purpose: 'Practice on the page with guided reflection and exercises.', href: '#workbooks' },
+  { label: 'Meditation Programs', purpose: 'Practice with guided audio for attention, stress, and reactivity.', href: '#meditations' },
+  { label: 'Classes', purpose: 'Learn live with structure, guidance, and accountability.', href: '#classes' },
+];
 
 export default function PowerToolsPage() {
+  const trilogyDeliverable = isDeliverable('power_tools_bundle', true);
+
   return (
     <main style={{ fontFamily: 'var(--font-sans)' }}>
 
@@ -108,24 +128,35 @@ export default function PowerToolsPage() {
       <section style={{ backgroundColor: 'var(--color-brand-cream)', padding: 'clamp(3.5rem, 7vw, 5.5rem) 1.5rem', textAlign: 'center' }}>
         <div style={{ maxWidth: '780px', margin: '0 auto' }}>
           <span className="eyebrow">Power Tools</span>
-          <h1 style={{ fontSize: 'clamp(2rem, 4.5vw, 3.25rem)', fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1.1, color: 'var(--color-brand-text)', margin: '1rem 0 1.5rem' }}>
+          <h1
+            style={{
+              fontSize: 'clamp(1.9rem, 4.5vw, 3rem)',
+              fontWeight: 800,
+              letterSpacing: '-0.03em',
+              lineHeight: 1.12,
+              color: 'var(--color-brand-text)',
+              margin: '1rem 0 1.5rem',
+            }}
+          >
             Power Tools for Practicing Change
           </h1>
-          <p style={{ fontSize: 'clamp(1rem, 1.8vw, 1.15rem)', lineHeight: 1.75, color: 'var(--color-brand-text-muted)', maxWidth: '60ch', margin: '0 auto 1rem' }}>
+          <p style={{ fontSize: '1.0625rem', lineHeight: 1.8, color: 'var(--color-brand-text-muted)', maxWidth: '60ch', margin: '0 auto 1rem' }}>
             Insight matters, but insight alone rarely changes a pattern. Power Tools are practical
-            classes, workbooks, guided meditations, books and free tools that help you keep
-            practicing after the first insight.
+            classes, workbooks, guided meditations, books, media resources, and free tools that help
+            you keep practicing after the first insight.
           </p>
-          <p style={{ fontSize: '1.0125rem', color: 'var(--color-brand-text-muted)', marginBottom: '2rem' }}>
+          <p style={{ fontSize: '1.0625rem', lineHeight: 1.8, color: 'var(--color-brand-text-muted)', maxWidth: '60ch', margin: '0 auto 2.25rem' }}>
             Choose the support that fits what you are working with today.
           </p>
           <div style={{ display: 'flex', gap: '0.875rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a href="#featured" className="btn-primary" style={{ padding: '0.875rem 2rem' }}>Browse the Shop</a>
+            <a href="#paths" className="btn-primary" style={{ padding: '0.9375rem 2.25rem', fontSize: '1rem' }}>
+              Browse the Shop
+            </a>
             <a
-              href="https://www.whydidireactthatway.com/?utm_source=drmarkpirtle&utm_medium=powertools&utm_campaign=free_tool"
+              href={REFLECTION_TOOL_URL}
               target="_blank"
               rel="noopener noreferrer"
-              style={{ display: 'inline-flex', alignItems: 'center', border: '1.5px solid var(--color-brand-sienna)', color: 'var(--color-brand-sienna)', padding: '0.875rem 2rem', borderRadius: '9999px', fontWeight: 600, fontSize: 'var(--text-small)', textDecoration: 'none' }}
+              style={{ display: 'inline-flex', alignItems: 'center', border: '1.5px solid var(--color-brand-sienna)', color: 'var(--color-brand-sienna)', padding: '0.9375rem 2.25rem', borderRadius: '9999px', fontWeight: 600, fontSize: '1rem', textDecoration: 'none' }}
             >
               Try the Free Tool
             </a>
@@ -134,199 +165,275 @@ export default function PowerToolsPage() {
       </section>
 
       {/* ── CHOOSE YOUR STARTING POINT ── */}
-      <section style={{ backgroundColor: '#ffffff', padding: 'clamp(3rem, 6vw, 4.5rem) 1.5rem' }}>
-        <div className="container">
-          <SectionHeading eyebrow="Start here" title="Choose your starting point" />
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 12rem), 1fr))', gap: '1rem' }}>
-            {CATEGORIES.map(c => (
-              <a
-                key={c.label}
-                href={c.href}
-                style={{ display: 'block', padding: '1.25rem', borderRadius: '0.625rem', border: '1px solid var(--color-brand-warm-gray)', backgroundColor: 'var(--color-brand-off-white)', textDecoration: 'none' }}
-              >
-                <div style={{ fontWeight: 700, fontSize: '0.9375rem', color: 'var(--color-brand-text)', marginBottom: '0.375rem' }}>{c.label}</div>
-                <div style={{ fontSize: '0.8125rem', lineHeight: 1.55, color: 'var(--color-brand-text-muted)' }}>{c.copy}</div>
-              </a>
-            ))}
-          </div>
-        </div>
-      </section>
+      <Section
+        heading="Choose your starting point"
+        intro="Five ways in. Pick the one that matches where you are today."
+        background="var(--color-brand-off-white)"
+      >
+        <Grid min="14rem">
+          {STARTING_POINTS.map(s => (
+            <a
+              key={s.label}
+              href={s.href}
+              style={{
+                display: 'block',
+                backgroundColor: '#ffffff',
+                border: '1px solid var(--color-brand-warm-gray)',
+                borderRadius: '0.625rem',
+                padding: '1.25rem',
+                textDecoration: 'none',
+                boxShadow: 'var(--shadow-card)',
+              }}
+            >
+              <div style={{ fontWeight: 700, fontSize: 'var(--text-small)', color: 'var(--color-brand-text)', marginBottom: '0.4rem' }}>
+                {s.label}
+              </div>
+              <div style={{ fontSize: '0.8125rem', lineHeight: 1.55, color: 'var(--color-brand-text-muted)' }}>
+                {s.purpose}
+              </div>
+            </a>
+          ))}
+        </Grid>
+      </Section>
 
-      {/* ── FEATURED PRACTICE PATHS ── */}
-      <section id="featured" style={{ backgroundColor: 'var(--color-brand-off-white)', padding: 'clamp(3rem, 6vw, 4.5rem) 1.5rem', scrollMarginTop: '6.25rem' }}>
-        <div className="container">
-          <SectionHeading
-            eyebrow="Featured"
-            title="Featured practice paths"
-            intro="The two purchases that make the most sense together, so you do not have to assemble the path yourself."
+      {/* ── FEATURED PRACTICE PATHS ──
+          Mark's doc asks for only two true bundles, and explicitly rules out a
+          meditation bundle because the Comprehensive Program already contains
+          the other two — it is the flagship, not a third bundle. The Complete
+          Practice Path is absent because he never priced it, and it is the only
+          offer containing a physical book. */}
+      <Section
+        id="paths"
+        eyebrow="Featured"
+        heading="Practice paths"
+        intro="If you already know you want more than one resource, these are the obvious ways to buy."
+      >
+        <Grid min="20rem">
+          <ProductCard
+            {...card('power_tools_bundle', {
+              badge: 'Bundle',
+              title: 'SkillfullyAware Workbook Trilogy',
+              bestFor: 'Readers who want to practice the ideas from Built This Way on the page.',
+              problem:
+                'Three guided workbooks for seeing your patterns, understanding what drives them, and practicing a more aware way of living.',
+              includes: 'All three workbooks: See Yourself, Understand Yourself, Evolve Yourself.',
+              ctaLabel: 'Get the Workbook Trilogy',
+              featured: trilogyDeliverable,
+              wasPrice: '$87',
+              saving: 'Save $18',
+              comingSoonNote: 'Coming soon',
+            })}
           />
-          <div style={GRID}>
-            <ProductCard product={card('power_tools_bundle')} />
-            <ProductCard product={card('comprehensive_meditation_program')} />
-          </div>
-        </div>
-      </section>
+          <ProductCard
+            {...card('comprehensive_meditation_program', {
+              badge: 'Flagship',
+              title: 'Comprehensive Guided Meditation Program',
+              bestFor: 'People who want one complete audio practice library rather than choosing track by track.',
+              problem:
+                'The full guided meditation library, including Learn to Meditate, the Feel Better Series, and advanced and specialty practices.',
+              ctaLabel: 'Access the Program',
+            })}
+          />
+        </Grid>
+      </Section>
 
       {/* ── FREE TOOL ── */}
-      <section style={{ backgroundColor: '#ffffff', padding: 'clamp(3rem, 6vw, 4.5rem) 1.5rem' }}>
-        <div className="container">
-          <SectionHeading id="free-tool" eyebrow="Free" title="Why Did I React That Way?" />
-          <div style={{ border: '1px solid var(--color-brand-warm-gray)', borderRadius: '0.75rem', padding: '1.75rem', backgroundColor: 'var(--color-brand-cream)', maxWidth: '46rem' }}>
-            <p style={{ fontSize: '1rem', lineHeight: 1.7, color: 'var(--color-brand-text)', marginTop: 0, marginBottom: '0.875rem' }}>
-              You reacted, shut down, got defensive, spiralled, or repeated an old pattern — and you
-              want to understand what may have happened.
-            </p>
-            <p style={{ fontSize: '0.9375rem', lineHeight: 1.7, color: 'var(--color-brand-text-muted)', marginBottom: '1.5rem' }}>
-              A free personalised reflection based on one real reaction. No account required.
-            </p>
-            <a
-              href="https://www.whydidireactthatway.com/?utm_source=drmarkpirtle&utm_medium=powertools&utm_campaign=free_tool_section"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-primary"
-              style={{ padding: '0.75rem 1.75rem' }}
-            >
-              Try the Free Tool
-            </a>
-          </div>
-        </div>
-      </section>
+      <Section
+        id="free-tool"
+        eyebrow="Start free"
+        heading="Why Did I React That Way?"
+        intro="Bring one real reaction and get a personalised reflection on the pattern underneath. Free, and no account required."
+        background="var(--color-brand-off-white)"
+      >
+        <Grid min="20rem">
+          <ProductCard
+            title="Why Did I React That Way?"
+            badge="Free tool"
+            bestFor="Anyone who reacted, shut down, got defensive, or repeated an old pattern and wants to understand it."
+            problem="A free personalised reflection based on one real reaction."
+            includes="Five questions, a written reflection on screen and by email. No account required."
+            status="free"
+            href={REFLECTION_TOOL_URL}
+            ctaLabel="Try the Free Tool"
+          />
+        </Grid>
+      </Section>
 
       {/* ── BOOK & MEDIA ── */}
-      <section style={{ backgroundColor: 'var(--color-brand-off-white)', padding: 'clamp(3rem, 6vw, 4.5rem) 1.5rem' }}>
-        <div className="container">
-          <SectionHeading id="book-media" eyebrow="Book & media" title="Start with the framework" />
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 20rem), 1fr))', gap: '1.25rem', alignItems: 'start' }}>
-
-            <div style={{ display: 'flex', gap: '1.25rem', backgroundColor: '#ffffff', border: '1px solid var(--color-brand-warm-gray)', borderRadius: '0.75rem', padding: '1.5rem', boxShadow: 'var(--shadow-card)' }}>
-              <Image
-                src="/images/book-cover.webp"
-                alt="Built This Way, by Dr. Mark Pirtle"
-                width={640}
-                height={986}
-                sizes="120px"
-                style={{ width: '6.5rem', height: 'auto', borderRadius: '0.375rem', flexShrink: 0, alignSelf: 'flex-start', boxShadow: 'var(--shadow-card)' }}
-              />
-              <div>
-                <h3 style={{ fontSize: '1.0625rem', fontWeight: 700, marginBottom: '0.5rem', color: 'var(--color-brand-text)' }}>Built This Way</h3>
-                <p style={{ fontSize: '0.9375rem', lineHeight: 1.65, color: 'var(--color-brand-text-muted)', marginBottom: '1rem' }}>
-                  The best starting point for understanding why painful patterns repeat and how real
-                  change becomes possible.
-                </p>
-                <Link href="/power-tools/book" style={{ fontWeight: 600, fontSize: '0.9375rem', color: 'var(--color-brand-sienna)', textDecoration: 'none' }}>
-                  Preorder the Book →
-                </Link>
-              </div>
-            </div>
-
-            <div style={{ backgroundColor: '#ffffff', border: '1px solid var(--color-brand-warm-gray)', borderRadius: '0.75rem', padding: '1.5rem', boxShadow: 'var(--shadow-card)' }}>
-              <h3 style={{ fontSize: '1.0625rem', fontWeight: 700, marginBottom: '0.5rem', color: 'var(--color-brand-text)' }}>Is Your Story Making You Sick?</h3>
-              <p style={{ fontSize: '0.9375rem', lineHeight: 1.65, color: 'var(--color-brand-text-muted)', marginBottom: '1rem' }}>
-                Dr. Pirtle&apos;s documentary on the stories we carry and the toll they can take.
-              </p>
-              <a
-                href="https://tubitv.com/movies/701292/is-your-story-making-you-sick"
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ fontWeight: 600, fontSize: '0.9375rem', color: 'var(--color-brand-sienna)', textDecoration: 'none' }}
-              >
-                Watch the Film →
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
+      <Section
+        id="book-media"
+        eyebrow="Understand the framework"
+        heading="Book and media"
+        intro="Start here if you want the whole picture before you start practising."
+      >
+        <Grid min="18rem">
+          <ProductCard
+            title="Built This Way"
+            badge="Book"
+            bestFor="Anyone who has ever thought, “I know better, but I still do it.”"
+            problem="The best starting point for understanding why painful patterns repeat and how real change becomes possible."
+            includes="The book, publishing 22 October 2026. Join the launch team for early excerpts."
+            status="link"
+            href="/power-tools/book"
+            ctaLabel="Preorder the Book"
+          />
+          <ProductCard
+            title="Is Your Story Making You Sick?"
+            badge="Documentary"
+            bestFor="People who want to see the ideas through real stories rather than read about them."
+            problem="Dr. Pirtle's documentary on the stories we carry and the toll they can take."
+            includes="Feature documentary, available to stream."
+            status="link"
+            href="https://tubitv.com/movies/701292/is-your-story-making-you-sick"
+            ctaLabel="Stream the Film"
+          />
+          <ProductCard
+            title="Boundarylessness of Awareness"
+            badge="Reader bonus"
+            bestFor="Readers of Built This Way working through Chapter 8."
+            problem="A companion guided audio for readers of the book."
+            includes="Guided audio, included with the book rather than sold separately."
+            status="coming-soon"
+            comingSoonNote="With the book, October"
+          />
+        </Grid>
+      </Section>
 
       {/* ── WORKBOOKS ── */}
-      <section style={{ backgroundColor: '#ffffff', padding: 'clamp(3rem, 6vw, 4.5rem) 1.5rem' }}>
-        <div className="container">
-          <SectionHeading
-            id="workbooks"
-            eyebrow="Workbooks"
-            title="Practice on the page"
-            intro="Three guided workbooks in a progression: see yourself, understand yourself, evolve yourself. Buy the set or take them one at a time."
+      <Section
+        id="workbooks"
+        eyebrow="Practice on the page"
+        heading="Workbooks"
+        intro="Three guided workbooks, designed as a progression: see yourself, understand yourself, evolve yourself. Buy one, or take the trilogy."
+        background="var(--color-brand-off-white)"
+      >
+        <Grid>
+          <ProductCard
+            {...card('becoming_skillfullyaware_workbook', {
+              badge: 'Workbook',
+              bestFor: 'People who want to notice their patterns sooner.',
+              problem: 'Guided workbook for seeing patterns clearly and practising with attention, emotion, and reaction.',
+              ctaLabel: 'Buy Workbook',
+            })}
           />
-          <div style={GRID}>
-            <ProductCard product={card('power_tools_bundle')} />
-            <ProductCard product={card('becoming_skillfullyaware_workbook')} />
-            <ProductCard product={card('unfinished_business_workbook')} />
-            <ProductCard product={card('raising_awareness_workbook')} />
-          </div>
-        </div>
-      </section>
+          <ProductCard
+            {...card('unfinished_business_workbook', {
+              badge: 'Workbook',
+              bestFor: 'People working with shadow, projection, resistance, anger, and boundaries.',
+              problem: 'Guided workbook for understanding and integrating hidden protective strategies.',
+              ctaLabel: 'Buy Workbook',
+            })}
+          />
+          <ProductCard
+            {...card('raising_awareness_workbook', {
+              badge: 'Workbook',
+              bestFor: 'People who want to expand perspective, maturity, and compassion.',
+              problem: 'Guided workbook for development, perspective-taking, and higher-good practice.',
+              ctaLabel: 'Buy Workbook',
+            })}
+          />
+        </Grid>
+      </Section>
 
       {/* ── MEDITATION PROGRAMS ── */}
-      <section style={{ backgroundColor: 'var(--color-brand-off-white)', padding: 'clamp(3rem, 6vw, 4.5rem) 1.5rem' }}>
-        <div className="container">
-          <SectionHeading
-            id="meditation-programs"
-            eyebrow="Meditation programs"
-            title="Practice with guided audio"
-            intro="The Comprehensive Program is the full library and already includes the other two, so there is no reason to buy them alongside it."
+      <Section
+        id="meditations"
+        eyebrow="Practice with audio"
+        heading="Guided meditation programs"
+        intro="Guided audio for attention, stress, reactivity, and awareness. The Comprehensive Program is the full library and includes the other two."
+      >
+        <Grid>
+          <ProductCard
+            {...card('learn_to_meditate_series', {
+              badge: 'Meditation',
+              bestFor: 'People who want to meditate but need a clear foundation.',
+              problem:
+                'Guidance for what to do with attention, posture, breath, and a wandering mind.',
+              ctaLabel: 'Get the Program',
+            })}
           />
-          <div style={GRID}>
-            <ProductCard product={card('comprehensive_meditation_program')} />
-            <ProductCard product={card('learn_to_meditate_series')} />
-            <ProductCard product={card('feel_better_series')} />
-          </div>
-        </div>
-      </section>
+          <ProductCard
+            {...card('feel_better_series', {
+              badge: 'Meditation',
+              bestFor: 'People feeling stressed, reactive, or activated in the body.',
+              problem: 'Guided support for returning to steadiness when the body is activated.',
+              ctaLabel: 'Get the Series',
+            })}
+          />
+          <ProductCard
+            {...card('comprehensive_meditation_program', {
+              badge: 'Flagship',
+              bestFor: 'People who want the full library rather than one series at a time.',
+              problem: 'The complete guided practice library, including both other programs.',
+              ctaLabel: 'Access the Program',
+              featured: isDeliverable('comprehensive_meditation_program', true),
+            })}
+          />
+        </Grid>
+      </Section>
 
       {/* ── CLASSES ── */}
-      <section style={{ backgroundColor: '#ffffff', padding: 'clamp(3rem, 6vw, 4.5rem) 1.5rem' }}>
-        <div className="container">
-          <SectionHeading
-            id="online-classes"
-            eyebrow="Live online classes"
-            title="Practice live, with support"
-            intro="These are live cohorts rather than downloads. Mark will be in touch with the schedule after you join."
+      <Section
+        id="classes"
+        eyebrow="Practice live"
+        heading="Online classes"
+        intro="Live classes with Mark, for people who want structure, guidance, and accountability. These are scheduled cohorts rather than downloads."
+        background="var(--color-brand-off-white)"
+      >
+        <Grid min="20rem">
+          <ProductCard
+            {...card('project_skillfullyaware_live_class', {
+              badge: 'Live class',
+              bestFor: 'People who want live structure applying SkillfullyAware to daily pattern change.',
+              problem:
+                'Live, guided practice with attention, emotions, habits, reactions, and daily pattern change.',
+              includes: 'Live six-week online class. Mark will be in touch with cohort dates.',
+              ctaLabel: 'Join the Class',
+            })}
           />
-          <div style={GRID}>
-            <ProductCard product={card('project_skillfullyaware_live_class')} />
-            <ProductCard product={card('mindfully_overcoming_addictive_behaviors_live_class')} />
-          </div>
-        </div>
-      </section>
+          <ProductCard
+            {...card('mindfully_overcoming_addictive_behaviors_live_class', {
+              badge: 'Live class',
+              bestFor: 'People wanting live support with addictive or compulsive patterns.',
+              problem:
+                'Live support for addictive or compulsive patterns, nervous system responses, and the protective strategies underneath them. Educational support, not treatment.',
+              includes: 'Live ten-week online class. Mark will be in touch with cohort dates.',
+              ctaLabel: 'Join the Class',
+            })}
+          />
+        </Grid>
+      </Section>
 
       {/* ── HOW TO CHOOSE ── */}
-      <section style={{ backgroundColor: 'var(--color-brand-off-white)', padding: 'clamp(3rem, 6vw, 4.5rem) 1.5rem' }}>
-        <div className="container" style={{ maxWidth: '48rem' }}>
-          <SectionHeading eyebrow="Not sure?" title="How to choose your next Power Tool" />
-          <p style={{ fontSize: '1.0125rem', lineHeight: 1.85, color: 'var(--color-brand-text-muted)' }}>
-            Start with the free tool if you want to look at one reaction right now. Start with the
-            book if you want the full framework. Choose the workbooks if you want to write and
-            reflect. Choose the meditation programs if you want guided audio practice. Choose a
-            class if you want live structure and support.
-          </p>
-        </div>
-      </section>
+      <Section heading="How to choose your next Power Tool">
+        <p style={{ fontSize: '1.0625rem', lineHeight: 1.85, color: 'var(--color-brand-text-muted)', maxWidth: '62ch', margin: 0 }}>
+          Start with the free tool if you want to look at one reaction right now. Start with the book
+          if you want the full framework. Choose the workbooks if you want to write and reflect.
+          Choose the meditation programs if you want guided audio practice. Choose a class if you
+          want live structure and support.
+        </p>
+      </Section>
 
       {/* ── FINAL CTA ── */}
       <section className="section-dark" style={{ padding: 'clamp(3rem, 6vw, 4.5rem) 1.5rem', textAlign: 'center' }}>
-        <div style={{ maxWidth: '46rem', margin: '0 auto' }}>
-          <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2.1rem)', fontWeight: 800, color: '#ffffff', marginBottom: '1rem' }}>
-            Not sure which Power Tool fits?
+        <div style={{ maxWidth: '620px', margin: '0 auto' }}>
+          <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2.1rem)', fontWeight: 800, color: '#ffffff', marginBottom: '1rem', lineHeight: 1.2 }}>
+            Not sure what fits?
           </h2>
-          <p style={{ fontSize: '1.0125rem', lineHeight: 1.8, color: 'rgba(255,255,255,0.75)', marginBottom: '2rem' }}>
-            Start with the free tool or the book. If you already know what you want to practice,
-            choose the workbook, meditation program or class that matches it. Still unsure? Send a
-            note and we will point you toward the best starting place.
+          <p style={{ fontSize: '1.0625rem', lineHeight: 1.8, color: 'rgba(255,255,255,0.75)', marginBottom: '2rem' }}>
+            Tell Mark what you are working with and he will point you to the right starting place.
           </p>
           <div style={{ display: 'flex', gap: '0.875rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link href="/power-tools/book" className="btn-primary" style={{ padding: '0.875rem 2rem' }}>Start with the Book</Link>
+            <Link href="/contact" className="btn-primary" style={{ padding: '0.9375rem 2.25rem', fontSize: '1rem' }}>
+              Ask Mark
+            </Link>
             <Link
-              href="/contact"
-              style={{ display: 'inline-flex', alignItems: 'center', border: '1.5px solid rgba(255,255,255,0.5)', color: '#ffffff', padding: '0.875rem 2rem', borderRadius: '9999px', fontWeight: 600, fontSize: 'var(--text-small)', textDecoration: 'none' }}
+              href="/power-tools/downloads"
+              style={{ display: 'inline-flex', alignItems: 'center', border: '1.5px solid rgba(255,255,255,0.5)', color: '#ffffff', padding: '0.9375rem 2.25rem', borderRadius: '9999px', fontWeight: 600, fontSize: '1rem', textDecoration: 'none' }}
             >
-              Ask Which Tool Fits
+              Find my downloads
             </Link>
           </div>
-          <p style={{ marginTop: '2rem', fontSize: '0.8125rem', color: 'rgba(255,255,255,0.55)' }}>
-            Already bought something?{' '}
-            <Link href="/power-tools/downloads" style={{ color: 'rgba(255,255,255,0.8)' }}>
-              Resend my download links
-            </Link>
-          </p>
         </div>
       </section>
     </main>
