@@ -25,6 +25,12 @@ export interface Product {
   digitalDelivery: boolean;
   /** Product keys contained in a bundle, for entitlement on fulfilment. */
   contains?: string[];
+  /**
+   * Names this product went by in Stripe before the catalogue existed. The
+   * sync adopts a match instead of creating a duplicate alongside it, which
+   * matters because the older product may already have been sold.
+   */
+  legacyNames?: string[];
 }
 
 export const PRODUCTS: Product[] = [
@@ -38,6 +44,9 @@ export const PRODUCTS: Product[] = [
     category: 'workbook',
     includes: 'Workbook (PDF)',
     digitalDelivery: true,
+    // Created by hand in live Stripe on 2026-03-07 at $24, before this
+    // catalogue existed. Adopted rather than duplicated.
+    legacyNames: ['Becoming SkillfullyAware Workbook'],
   },
   {
     key: 'unfinished_business_workbook',

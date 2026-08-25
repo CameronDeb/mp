@@ -81,8 +81,16 @@ async function main() {
       /* search unavailable on brand-new accounts; fall through to the scan */
     }
     if (!existing) {
+      // Fall back to a scan, which also picks up products created by hand
+      // before this catalogue existed. Adopting one is much better than
+      // leaving a duplicate beside it, since the original may have sold.
+      const wanted = new Set([p.name, ...(p.legacyNames ?? [])]);
       for await (const candidate of stripe.products.list({ limit: 100 })) {
         if (candidate.metadata?.product_key === p.key) { existing = candidate; break; }
+        if (!candidate.metadata?.product_key && wanted.has(candidate.name)) {
+          existing = candidate;
+          console.log(`  ADOPT    ${p.key}  <- existing "${candidate.name}" (${candidate.id})`);
+        }
       }
     }
 
