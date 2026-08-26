@@ -9,16 +9,12 @@ export function BuiltThisWay({ copy }: { copy: HomepageCopy }) {
       backgroundColor: '#ffffff',
       padding: '5rem 0',
     }}>
-      <div className="container" style={{
-        display: 'grid',
-        gridTemplateColumns: '1fr 1fr',
-        gap: '4rem',
-        alignItems: 'center',
-      }}>
+      {/* .split-2 stacks below 900px — see globals.css */}
+      <div className="container split-2">
 
         {/* Book cover. Centred within its grid column so it sits under the
             heading rather than hard against the left gutter. */}
-        <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <div className="split-2-media" style={{ display: 'flex', justifyContent: 'center' }}>
           <Image
             src="/images/book-cover.webp"
             alt="Built This Way: Why Painful Patterns Repeat and How to Change Them, by Dr. Mark Pirtle"

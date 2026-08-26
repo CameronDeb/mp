@@ -159,6 +159,29 @@ p {
   max-width: 68ch;
 }
 
+/* Two-column split sections (book, SAAQ). These were a hardcoded 1fr 1fr with
+   no breakpoint, so on a 375px phone they stayed side by side as a 131px
+   column beside a 148px one — a postage-stamp book cover next to a 1,593px
+   ribbon of text. Below 900px they stack, and the media column is capped and
+   centred so it reads as a cover rather than a thumbnail. */
+.split-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+}
+
+@media (max-width: 900px) {
+  .split-2 {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+  .split-2 > .split-2-media {
+    max-width: 15rem;
+    margin-inline: auto;
+  }
+}
+
 /* ── Homepage hero ────────────────────────────────────────────────────────
    The hero photo is a 2500x1230 landscape with Mark far right of centre, and
    the desktop layout leans on that: the photo is pinned right and a horizontal

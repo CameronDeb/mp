@@ -7,12 +7,8 @@ export function SAAQSection({ copy }: { copy: HomepageCopy }) {
       backgroundColor: 'var(--color-brand-cream)',
       padding: '5rem 0',
     }}>
-      <div className="container" style={{
-        display: 'grid',
-        gridTemplateColumns: '1fr 1fr',
-        gap: '4rem',
-        alignItems: 'center',
-      }}>
+      {/* .split-2 stacks below 900px — see globals.css */}
+      <div className="container split-2">
 
         <div>
           <p style={{
