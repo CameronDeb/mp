@@ -134,8 +134,18 @@ export async function POST(request: NextRequest) {
 <p>Books do not move into the world by themselves. They move because real people read them, talk
 about them, and place them in the hands of someone who may need the message. I am grateful for
 your help doing that.</p>
-<p>I will be in touch with launch updates, early excerpts, and simple ways to help as we get
-closer. Nothing complicated, and no pressure.</p>
+<p><strong>Everything the launch team receives lives here:</strong></p>
+<p style="margin:22px 0;">
+  <a href="${SITE_URL}/launch-team/welcome"
+     style="background:#c0522a;color:#ffffff;padding:13px 26px;border-radius:999px;text-decoration:none;font-weight:bold;display:inline-block;">
+    Open your launch team page
+  </a>
+</p>
+<p style="font-size:13px;color:#666;">Worth bookmarking — the Pattern Reflection Kit, the
+Boundarylessness of Awareness audio, selected excerpts, the launch-week sharing kit and Pattern
+Lab details all appear on that page as they become available.</p>
+<p>I will also be in touch with launch updates as we get closer. Nothing complicated, and no
+pressure.</p>
 <p>— Mark</p>
 <p style="font-size:11px;color:#9ca3af;">You can <a href="%unsubscribe_url%" style="color:#9ca3af;">unsubscribe</a> at any time.</p>
 </td></tr></table></td></tr></table></body></html>`,

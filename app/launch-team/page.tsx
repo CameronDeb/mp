@@ -27,13 +27,19 @@ const WHAT_MEMBERS_DO = [
   'Post about the book or send a short personal recommendation during launch week.',
 ];
 
+/**
+ * Names are Mark's, confirmed 27 Aug 2026, and must match the newsletter that
+ * goes to the whole list — it had been describing the same six things under
+ * different names, so "Reader Reflection Guide" became the Pattern Reflection
+ * Kit and "private live conversation" became the Pattern Lab.
+ */
 const WHAT_MEMBERS_RECEIVE = [
   'Early launch updates from me',
   'Selected excerpts from the book',
-  'A downloadable Built This Way Reader Reflection Guide',
-  'Access to the Boundarylessness of Awareness guided audio',
-  'A simple launch-week sharing kit with sample posts, email language, and book graphics',
-  'An invitation to a private live online conversation with me about the book, the practices, and the larger SkillfullyAware path',
+  'The Pattern Reflection Kit',
+  'The Boundarylessness of Awareness guided audio',
+  'A launch-week sharing kit with sample posts, email language, and book graphics',
+  'An invitation to the Pattern Lab — a private live session with me about the book, the practices, and the larger SkillfullyAware path',
 ];
 
 function Heading({ children }: { children: React.ReactNode }) {
