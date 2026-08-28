@@ -46,12 +46,18 @@ mid-warm-up, which over four days it will.
 
 Each response returns `nextAfterId`. Pass it as `after_id` on the next day.
 
+Plan used for the first send (29 Aug 2026). The opening batch is 250 rather
+than a token 50: Mark is promoting the book the same morning and needs the send
+to have actually happened, and 250 is enough volume to produce meaningful
+complaint data within hours while still holding 84% of the list back if
+something goes wrong.
+
 | Day | batch_size | after_id | Sends | Remaining |
 |-----|-----------|----------|-------|-----------|
-| 1 | 50 | 0 | 50 | 1533 |
-| 2 | 150 | *day 1 `nextAfterId`* | 150 | 1383 |
-| 3 | 400 | *day 2 `nextAfterId`* | 400 | 983 |
-| 4 | *omit* | *day 3 `nextAfterId`* | 983 | 0 |
+| 1 | 250 | 0 | 250 | 1333 |
+| 2 | 400 | *day 1 `nextAfterId`* | 400 | 933 |
+| 3 | 500 | *day 2 `nextAfterId`* | 500 | 433 |
+| 4 | *omit* | *day 3 `nextAfterId`* | 433 | 0 |
 
 ```bash
 curl -X POST https://drmarkpirtle.com/api/send-newsletter -H "Content-Type: application/json" -H "x-api-secret: $NEWSLETTER_API_SECRET" -d '{"newsletter_id":ID,"batch_size":50,"after_id":0}'
