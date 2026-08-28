@@ -31,14 +31,19 @@ export const LAUNCH_MATERIALS: LaunchMaterial[] = [
     name: 'Pattern Reflection Kit',
     description:
       'A guided kit for looking at one of your own repeating patterns, and what sits underneath it.',
-    files: [],
+    files: [{ key: 'launch_team/PatternReflectionKit.pdf', filename: 'Pattern Reflection Kit.pdf' }],
   },
   {
     key: 'boundarylessness_audio',
     name: 'Boundarylessness of Awareness',
     description:
       'The guided audio practice from Chapter 8. Listen straight through the first time, then return to it.',
-    files: [],
+    files: [
+      {
+        key: 'launch_team/Boundarylessness-of-Awareness.m4a',
+        filename: 'Boundarylessness of Awareness.m4a',
+      },
+    ],
   },
   {
     key: 'selected_excerpts',
@@ -58,9 +63,9 @@ export const LAUNCH_MATERIALS: LaunchMaterial[] = [
     key: 'pattern_lab',
     name: 'Pattern Lab',
     description:
-      'A private live session with Mark about the book, the practices, and the wider SkillfullyAware path. Details are emailed to launch team members before publication.',
+      'A private live session with Mark about the book, the practices, and the wider SkillfullyAware path. Joining details are emailed to launch team members beforehand.',
     files: [],
-    note: 'Date to be announced',
+    note: 'Week of 26 October',
   },
   {
     key: 'reflection_tool',

@@ -17,8 +17,8 @@ const nextConfig: NextConfig = {
       { source: '/built-this-way', destination: '/launch-team', permanent: true },
       { source: '/powertools', destination: '/power-tools', permanent: true },
       { source: '/powertools/:path*', destination: '/power-tools/:path*', permanent: true },
-      // Printed in Chapter 8 as drmarkpirtle.com/boundarylessness.
-      { source: '/boundarylessness', destination: '/power-tools/book', permanent: false },
+      // /boundarylessness is a real page now (code-gated audio for readers),
+      // so it is no longer redirected. Printed in Chapter 8.
       // Printed in Chapter 10 as drmarkpirtle.com/saaq.
       { source: '/saaq', destination: '/consultation', permanent: false },
     ];
