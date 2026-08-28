@@ -50,14 +50,24 @@ export const LAUNCH_MATERIALS: LaunchMaterial[] = [
     name: 'Selected excerpts',
     description:
       'Early passages from Built This Way, so you know the message before you recommend it to anyone.',
-    files: [],
+    files: [
+      {
+        key: 'launch_team/BuiltThisWay-Selected-Excerpts.pdf',
+        filename: 'Built This Way - Selected Excerpts.pdf',
+      },
+    ],
   },
   {
     key: 'sharing_kit',
     name: 'Launch-week sharing kit',
     description:
       'Sample posts, email wording and book graphics. Everything you need to share the book without writing from scratch.',
-    files: [],
+    files: [
+      {
+        key: 'launch_team/Launch-Week-Sharing-Kit.pdf',
+        filename: 'Launch-Week Sharing Kit.pdf',
+      },
+    ],
   },
   {
     key: 'pattern_lab',
