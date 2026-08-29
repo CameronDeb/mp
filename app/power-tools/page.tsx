@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { ProductCard, type ProductCardProps } from '@/components/shop/ProductCard';
 import { PRODUCTS_BY_KEY, formatPrice } from '@/lib/products';
 import { isDeliverable } from '@/lib/downloads';
+import { getBookCta } from '@/lib/site-settings';
 
 export const metadata: Metadata = {
   title: 'Power Tools | Classes, Workbooks & Guided Meditations | Dr. Mark Pirtle',
@@ -118,8 +119,9 @@ const STARTING_POINTS = [
   { label: 'Classes', purpose: 'Learn live with structure, guidance, and accountability.', href: '#classes' },
 ];
 
-export default function PowerToolsPage() {
+export default async function PowerToolsPage() {
   const trilogyDeliverable = isDeliverable('power_tools_bundle', true);
+  const bookCta = await getBookCta();
 
   return (
     <main style={{ fontFamily: 'var(--font-sans)' }}>
@@ -274,8 +276,8 @@ export default function PowerToolsPage() {
             problem="The best starting point for understanding why painful patterns repeat and how real change becomes possible."
             includes="The book, publishing 22 October 2026. Join the launch team for early excerpts."
             status="link"
-            href="/power-tools/book"
-            ctaLabel="Preorder the Book"
+            href={bookCta.url}
+            ctaLabel={bookCta.label}
           />
           <ProductCard
             title="Is Your Story Making You Sick?"

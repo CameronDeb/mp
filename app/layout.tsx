@@ -3,7 +3,7 @@ import { Plus_Jakarta_Sans, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-import { getSiteMedia, getSiteCopy } from "@/lib/site-settings";
+import { getSiteMedia, getSiteCopy, getBookCta } from "@/lib/site-settings";
 import { getCuratedCategories } from "@/lib/blog";
 
 const jakarta = Plus_Jakarta_Sans({
@@ -31,20 +31,23 @@ export const metadata: Metadata = {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   // Nav and footer chrome is driven by Directus: logo and copy from
   // site_settings, blog categories from the curated `blog_categories` taxonomy.
-  const [media, copy, categories] = await Promise.all([
+  const [media, copy, categories, bookCta] = await Promise.all([
     getSiteMedia(),
     getSiteCopy(),
     getCuratedCategories(),
+    getBookCta(),
   ]);
 
   return (
     <html lang="en" className={`${jakarta.variable} ${playfair.variable}`}>
       <body style={{ fontFamily: "var(--font-sans)", backgroundColor: "var(--color-brand-cream)" }}>
+        {/* The header button follows the preorder link: it only says
+            "Preorder the Book" once book_preorder_url is filled in. */}
         <Header
           logo={media.logo}
           categories={categories}
-          ctaLabel={copy.navCtaLabel}
-          ctaUrl={copy.navCtaUrl}
+          ctaLabel={bookCta.label}
+          ctaUrl={bookCta.url}
         />
         <main>{children}</main>
         <Footer

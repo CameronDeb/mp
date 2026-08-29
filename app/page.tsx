@@ -10,7 +10,7 @@ import { LatestBlogPosts }   from '@/components/sections/LatestBlogPosts';
 import { NewsletterSignup }  from '@/components/sections/NewsletterSignup';
 import { getPageBySlug }     from '@/lib/pages';
 import { getHomepageCopy }   from '@/lib/homepage';
-import { getSiteMedia, getSiteCopy } from '@/lib/site-settings';
+import { getSiteMedia, getSiteCopy, getSectionToggles } from '@/lib/site-settings';
 import { getTestimonials }   from '@/lib/testimonials';
 import { getAllPosts }       from '@/lib/blog';
 import BlockRenderer         from '@/components/blocks/BlockRenderer';
@@ -25,13 +25,14 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function HomePage() {
-  const [cmsPage, copy, media, siteCopy, testimonials, posts] = await Promise.all([
+  const [cmsPage, copy, media, siteCopy, testimonials, posts, sections] = await Promise.all([
     getPageBySlug('/'),
     getHomepageCopy(),
     getSiteMedia(),
     getSiteCopy(),
     getTestimonials(),
     getAllPosts(),
+    getSectionToggles(),
   ]);
 
   // If the homepage is ever rebuilt with the page builder, those blocks win.
@@ -56,17 +57,22 @@ export default async function HomePage() {
       <BuiltThisWay copy={copy} />                   {/* Launch: publishing Oct 22 */}
       <WhyDidIReact copy={copy} />                   {/* The book, applied */}
       <LeaderPathway copy={copy} />                  {/* SAAQ → Forum Retreats → Coaching */}
-      <PowerToolsPreview copy={copy} />
-      <AboutMark portrait={media.aboutPortrait} copy={copy} />
-      <Testimonials
-        items={testimonials}
-        eyebrow={copy.testimonials_eyebrow}
-        heading={copy.testimonials_heading}
-        intro={copy.testimonials_intro}
-        ctaLabel={copy.testimonials_cta_label}
-        ctaUrl={copy.testimonials_cta_url}
-      />
-      <LatestBlogPosts copy={copy} posts={posts.slice(0, 3)} />
+      {/* Each of these is switched on or off from Site Settings in the CMS, so
+          Mark can hide a section himself without any of its wording being
+          deleted. */}
+      {sections.powertools && <PowerToolsPreview copy={copy} />}
+      {sections.about && <AboutMark portrait={media.aboutPortrait} copy={copy} />}
+      {sections.testimonials && (
+        <Testimonials
+          items={testimonials}
+          eyebrow={copy.testimonials_eyebrow}
+          heading={copy.testimonials_heading}
+          intro={copy.testimonials_intro}
+          ctaLabel={copy.testimonials_cta_label}
+          ctaUrl={copy.testimonials_cta_url}
+        />
+      )}
+      {sections.blog && <LatestBlogPosts copy={copy} posts={posts.slice(0, 3)} />}
       <NewsletterSignup
         heading={siteCopy.newsletterHeading}
         body={siteCopy.newsletterBody}
