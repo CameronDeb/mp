@@ -21,6 +21,14 @@ function buildNavigation(blogCategories: HeaderCategory[]) {
     },
     // V3 promoted the book into the main nav for the launch window.
     { name: 'Book',           href: '/power-tools/book' },
+    // The free reflection tool is the top of the funnel, so it belongs in the
+    // nav rather than only being findable from the homepage. External app, so
+    // it carries its own source tag.
+    {
+      name: 'Reflection Tool',
+      href: 'https://www.whydidireactthatway.com/?utm_source=drmarkpirtle&utm_medium=nav',
+      external: true,
+    },
     { name: 'Forum Retreats', href: '/forum-retreats'   },
     { name: 'SAAQ Coaching',  href: '/consultation'     },
     {
@@ -132,7 +140,11 @@ export function Header({
                 onMouseLeave={() => setOpenDropdown(null)}
               >
                 {/* Every top-level label is a real link; the dropdown is hover-only. */}
-                <Link href={item.href} style={{
+                <Link href={item.href}
+                  {...('external' in item && item.external
+                    ? { target: '_blank', rel: 'noopener noreferrer' }
+                    : {})}
+                  style={{
                   padding: '0.25rem 0', textDecoration: 'none',
                   color: linkColor, fontSize: 'var(--text-small)', fontWeight: 600,
                   fontFamily: 'var(--font-sans)', letterSpacing: '0.05em',
@@ -239,6 +251,9 @@ export function Header({
                 <div key={item.name}>
                   {!item.dropdown ? (
                     <Link href={item.href} onClick={() => setMobileOpen(false)}
+                      {...('external' in item && item.external
+                        ? { target: '_blank', rel: 'noopener noreferrer' }
+                        : {})}
                       style={{ display: 'block', padding: '0.75rem', borderRadius: '0.5rem', textDecoration: 'none', fontWeight: 600, fontSize: 'var(--text-small)', color: '#000', transition: 'background 0.15s' }}
                       onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#f9f7f4')}
                       onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
