@@ -8,6 +8,7 @@ import { AboutMark }         from '@/components/sections/AboutMark';
 import { Testimonials }      from '@/components/sections/Testimonials';
 import { LatestBlogPosts }   from '@/components/sections/LatestBlogPosts';
 import { NewsletterSignup }  from '@/components/sections/NewsletterSignup';
+import { MobilePathCards }   from '@/components/sections/MobilePathCards';
 import { getPageBySlug }     from '@/lib/pages';
 import { getHomepageCopy }   from '@/lib/homepage';
 import { getSiteMedia, getSiteCopy, getSectionToggles } from '@/lib/site-settings';
@@ -53,32 +54,69 @@ export default async function HomePage() {
   // put back here if that decision is ever reversed.
   return (
     <div className="min-h-screen">
-      <Hero image={media.heroImage} copy={copy} />  {/* The one path choice */}
-      <BuiltThisWay copy={copy} />                   {/* Launch: publishing Oct 22 */}
-      <WhyDidIReact copy={copy} />                   {/* The book, applied */}
-      <LeaderPathway copy={copy} />                  {/* SAAQ → Forum Retreats → Coaching */}
+      {/* Wrapped in .home-sections so mobile can reorder with flex `order`
+          rather than shipping a second page. Desktop order is the DOM order;
+          phones put the reflection tool before the book and hide the heavier
+          sections. See globals.css. */}
+      <div className="home-sections">
+      <div className="sec-hero"><Hero image={media.heroImage} copy={copy} /></div>
+      <div className="sec-book"><BuiltThisWay copy={copy} /></div>
+      <div className="sec-reflection"><WhyDidIReact copy={copy} /></div>
+      <div className="sec-paths mobile-only"><MobilePathCards /></div>
+      <div className="sec-leadership"><LeaderPathway copy={copy} /></div>
       {/* Each of these is switched on or off from Site Settings in the CMS, so
           Mark can hide a section himself without any of its wording being
           deleted. */}
-      {sections.powertools && <PowerToolsPreview copy={copy} />}
-      {sections.about && <AboutMark portrait={media.aboutPortrait} copy={copy} />}
-      {sections.testimonials && (
-        <Testimonials
-          items={testimonials}
-          eyebrow={copy.testimonials_eyebrow}
-          heading={copy.testimonials_heading}
-          intro={copy.testimonials_intro}
-          ctaLabel={copy.testimonials_cta_label}
-          ctaUrl={copy.testimonials_cta_url}
-        />
+      {sections.powertools && (
+        <div className="sec-powertools"><PowerToolsPreview copy={copy} /></div>
       )}
-      {sections.blog && <LatestBlogPosts copy={copy} posts={posts.slice(0, 3)} />}
-      <NewsletterSignup
-        heading={siteCopy.newsletterHeading}
-        body={siteCopy.newsletterBody}
-        buttonLabel={siteCopy.newsletterButtonLabel}
-        privacyLine={siteCopy.newsletterPrivacyLine}
-      />
+      {sections.about && (
+        <div className="sec-about"><AboutMark portrait={media.aboutPortrait} copy={copy} /></div>
+      )}
+      {sections.testimonials && (
+        <div className="sec-testimonial">
+          {/* One testimonial on a phone, all of them on desktop — three stacked
+              cards is a screen and a half of scrolling on mobile. */}
+          <div className="desktop-only">
+            <Testimonials
+              items={testimonials}
+              eyebrow={copy.testimonials_eyebrow}
+              heading={copy.testimonials_heading}
+              intro={copy.testimonials_intro}
+              ctaLabel={copy.testimonials_cta_label}
+              ctaUrl={copy.testimonials_cta_url}
+            />
+          </div>
+          <div className="mobile-only">
+            <Testimonials
+              items={testimonials.slice(0, 1)}
+              eyebrow={copy.testimonials_eyebrow}
+              heading={copy.testimonials_heading}
+              intro=""
+            />
+          </div>
+        </div>
+      )}
+      {sections.blog && (
+        <div className="sec-blog">
+          {/* Three post cards on desktop, one plus a link on a phone. */}
+          <div className="desktop-only">
+            <LatestBlogPosts copy={copy} posts={posts.slice(0, 3)} />
+          </div>
+          <div className="mobile-only">
+            <LatestBlogPosts copy={copy} posts={posts.slice(0, 1)} />
+          </div>
+        </div>
+      )}
+      <div className="sec-newsletter">
+        <NewsletterSignup
+          heading={siteCopy.newsletterHeading}
+          body={siteCopy.newsletterBody}
+          buttonLabel={siteCopy.newsletterButtonLabel}
+          privacyLine={siteCopy.newsletterPrivacyLine}
+        />
+      </div>
+      </div>
     </div>
   );
 }

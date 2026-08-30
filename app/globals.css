@@ -159,6 +159,47 @@ p {
   max-width: 68ch;
 }
 
+/* ── Mobile homepage ──────────────────────────────────────────────────────
+   Mark's brief: one responsive site, desktop untouched, but the phone version
+   should be "calm, clear and guided" rather than the whole ecosystem at once.
+
+   Everything below 768px is handled here rather than by shipping a second page,
+   so the URLs, the CMS and the brand system stay single-source. Sections are
+   reordered with flex `order` (reflection tool before the book, because it is
+   the easier first action) and the heavier sections are hidden rather than
+   shrunk — a squeezed desktop section is what made the phone feel overwhelming
+   in the first place. */
+.home-sections { display: flex; flex-direction: column; }
+
+.mobile-only  { display: none; }
+.desktop-only { display: block; }
+
+@media (max-width: 767px) {
+  .mobile-only  { display: block; }
+  .desktop-only { display: none; }
+
+  /* Mark's mobile order: hero, reflection tool, book, choose your path,
+     newsletter. Everything else is hidden or compacted. */
+  .home-sections > .sec-hero        { order: 1; }
+  .home-sections > .sec-reflection  { order: 2; }
+  .home-sections > .sec-book        { order: 3; }
+  .home-sections > .sec-paths       { order: 4; }
+  .home-sections > .sec-testimonial { order: 5; }
+  .home-sections > .sec-blog        { order: 6; }
+  .home-sections > .sec-newsletter  { order: 7; }
+
+  /* Hidden on phones per the brief: these repeat choices the path cards
+     already offer, and each one is a full screen of scrolling. */
+  .home-sections > .sec-leadership,
+  .home-sections > .sec-powertools,
+  .home-sections > .sec-about { display: none; }
+
+  /* Tighter vertical rhythm: the desktop spacing is most of what made the
+     phone version feel endless. */
+  .home-sections > * > section,
+  .home-sections > section { padding-top: 2.5rem; padding-bottom: 2.5rem; }
+}
+
 /* Two-column split sections (book, SAAQ). These were a hardcoded 1fr 1fr with
    no breakpoint, so on a 375px phone they stayed side by side as a 131px
    column beside a 148px one — a postage-stamp book cover next to a 1,593px

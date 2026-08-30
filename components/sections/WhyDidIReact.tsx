@@ -48,7 +48,8 @@ export function WhyDidIReact({ copy }: { copy: HomepageCopy }) {
           dangerouslySetInnerHTML={{ __html: copy.reflection_body_1 }}
         />
 
-        <p style={{
+        {/* Phones get Mark's shorter wording when it is filled in. */}
+        <p className={copy.reflection_mobile_body ? 'desktop-only' : undefined} style={{
           fontSize: '1.05rem',
           color: 'var(--color-brand-text-muted)',
           lineHeight: 1.75,
@@ -57,6 +58,17 @@ export function WhyDidIReact({ copy }: { copy: HomepageCopy }) {
         }}>
           {copy.reflection_body_2}
         </p>
+        {copy.reflection_mobile_body && (
+          <p className="mobile-only" style={{
+            fontSize: '1.05rem',
+            color: 'var(--color-brand-text-muted)',
+            lineHeight: 1.75,
+            maxWidth: '52ch',
+            margin: '0 auto 2.5rem',
+          }}>
+            {copy.reflection_mobile_body}
+          </p>
+        )}
 
         <a
           href={copy.reflection_cta_url}

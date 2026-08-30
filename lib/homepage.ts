@@ -28,6 +28,16 @@ export type HomepageCopy = {
   hero_headline: string;
   hero_body_1: string;
   hero_body_2: string;
+  /**
+   * Phone-only copy. Mark's mobile brief: "Do not simply shrink desktop
+   * content. Mobile should be written and structured for phone users." Each of
+   * these falls back to its desktop equivalent when left empty, so a blank
+   * field is never a blank section.
+   */
+  hero_mobile_headline: string;
+  hero_mobile_body: string;
+  reflection_mobile_body: string;
+  book_mobile_body: string;
   hero_orientation_line: string;
   hero_ctas: HeroCta[];
   hero_scroll_label: string;
@@ -128,6 +138,12 @@ export const HOMEPAGE_FALLBACK: HomepageCopy = {
   hero_body_2:
     'SkillfullyAware® helps you understand your patterns, work with them in real life, and become wiser, healthier, and more effective in how you live, relate, and lead.',
   hero_orientation_line: 'Choose the path that fits why you’re here today.',
+  // Empty on purpose: the components fall back to the desktop copy above, so an
+  // unfilled mobile field shows the full wording rather than nothing.
+  hero_mobile_headline: '',
+  hero_mobile_body: '',
+  reflection_mobile_body: '',
+  book_mobile_body: '',
   hero_ctas: [
     { title: 'Understand My Patterns', subtitle: 'Start with the Book', url: '/power-tools/book' },
     { title: 'Leadership, Forums & Retreats', subtitle: 'Explore Leadership Work', url: '/forum-retreats' },
