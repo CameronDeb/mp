@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { BuyButton, ComingSoon } from './BuyButton';
 
 /**
@@ -34,6 +35,8 @@ export interface ProductCardProps {
   status: 'buyable' | 'coming-soon' | 'free' | 'link';
   featured?: boolean;
   comingSoonNote?: string;
+  /** Cover art. Cards without one keep the plain badge header. */
+  image?: string;
 }
 
 export function ProductCard(p: ProductCardProps) {
@@ -69,6 +72,35 @@ export function ProductCard(p: ProductCardProps) {
         >
           Best value
         </span>
+      )}
+
+      {/* Cover art. Contained rather than cropped: these are book covers, and
+          cropping one cuts the title off. Slightly dimmed while a product is
+          not yet buyable so the card reads as pending at a glance. */}
+      {p.image && (
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            marginBottom: '1rem',
+            opacity: p.status === 'coming-soon' ? 0.55 : 1,
+          }}
+        >
+          <Image
+            src={p.image}
+            alt={p.title}
+            width={600}
+            height={750}
+            sizes="(max-width: 768px) 60vw, 220px"
+            style={{
+              width: '100%',
+              maxWidth: '11rem',
+              height: 'auto',
+              borderRadius: '0.5rem',
+              boxShadow: 'var(--shadow-card)',
+            }}
+          />
+        </div>
       )}
 
       <span

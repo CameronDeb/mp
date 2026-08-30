@@ -23,6 +23,8 @@ export interface Product {
   includes: string;
   /** Live classes are scheduled seats, not instant downloads. */
   digitalDelivery: boolean;
+  /** Cover art shown on the shop card. Cards fall back to a plain header. */
+  image?: string;
   /** Product keys contained in a bundle, for entitlement on fulfilment. */
   contains?: string[];
   /**
@@ -37,9 +39,10 @@ export const PRODUCTS: Product[] = [
   // ── Workbooks ──────────────────────────────────────────────────────────
   {
     key: 'becoming_skillfullyaware_workbook',
+    image: '/images/products/becoming-skillfullyaware.webp',
     name: 'Becoming SkillfullyAware — See Yourself',
     description:
-      'A guided workbook for noticing your patterns sooner and strengthening attention and awareness.',
+      'Train attention, expand awareness, and practice seeing your patterns as they happen so you can respond with more care and skill.',
     priceCents: 2900,
     category: 'workbook',
     includes: 'Workbook (PDF)',
@@ -50,9 +53,10 @@ export const PRODUCTS: Product[] = [
   },
   {
     key: 'unfinished_business_workbook',
+    image: '/images/products/unfinished-business.webp',
     name: 'Unfinished Business — Understand Yourself',
     description:
-      'A guided workbook for working with shadow, projection, resistance, anger, boundaries, and the protective strategies underneath them.',
+      'Explore the hidden needs, fears, projections, and protective patterns beneath repeated reactions so you can understand yourself more clearly.',
     priceCents: 2900,
     category: 'workbook',
     includes: 'Workbook (PDF)',
@@ -60,9 +64,10 @@ export const PRODUCTS: Product[] = [
   },
   {
     key: 'raising_awareness_workbook',
+    image: '/images/products/raising-awareness.webp',
     name: 'Raising Awareness — Evolve Yourself',
     description:
-      'A guided workbook for expanding perspective, maturity, compassion, and the ability to respond from a wider view.',
+      'Widen your perspective, increase maturity, and practice responding from a larger view with greater wisdom and care.',
     priceCents: 2900,
     category: 'workbook',
     includes: 'Workbook (PDF)',
@@ -75,9 +80,10 @@ export const PRODUCTS: Product[] = [
   // real and may be shown. His docs forbid implying savings that aren't.
   {
     key: 'power_tools_bundle',
+    image: '/images/products/workbook-bundle.webp',
     name: 'Complete Power Tools Workbook Bundle',
     description:
-      'All three guided workbooks — See Yourself, Understand Yourself, Evolve Yourself — for working through the full progression. Saves $18 against buying them separately.',
+      'A three-workbook practice sequence to help you see your patterns, understand what drives them, and respond from a wider, more SkillfullyAware perspective. Saves $18 against buying them separately.',
     priceCents: 6900,
     category: 'bundle',
     includes: 'Three workbooks (PDF)',

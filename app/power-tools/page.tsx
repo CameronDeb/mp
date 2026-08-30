@@ -39,6 +39,7 @@ function card(
     title: extra.title ?? p.name,
     badge: extra.badge ?? p.category,
     includes: extra.includes ?? p.includes,
+    image: p.image,
     price: formatPrice(p.priceCents),
     productKey: key,
     status: deliverable ? 'buyable' : 'coming-soon',
@@ -217,7 +218,7 @@ export default async function PowerToolsPage() {
               title: 'SkillfullyAware Workbook Trilogy',
               bestFor: 'Readers who want to practice the ideas from Built This Way on the page.',
               problem:
-                'Three guided workbooks for seeing your patterns, understanding what drives them, and practicing a more aware way of living.',
+                'A three-workbook practice sequence to help you see your patterns, understand what drives them, and respond from a wider, more SkillfullyAware perspective.',
               includes: 'All three workbooks: See Yourself, Understand Yourself, Evolve Yourself.',
               ctaLabel: 'Get the Workbook Trilogy',
               featured: trilogyDeliverable,
@@ -314,7 +315,7 @@ export default async function PowerToolsPage() {
             {...card('becoming_skillfullyaware_workbook', {
               badge: 'Workbook',
               bestFor: 'People who want to notice their patterns sooner.',
-              problem: 'Guided workbook for seeing patterns clearly and practising with attention, emotion, and reaction.',
+              problem: 'Train attention, expand awareness, and practice seeing your patterns as they happen so you can respond with more care and skill.',
               ctaLabel: 'Buy Workbook',
             })}
           />
@@ -322,7 +323,7 @@ export default async function PowerToolsPage() {
             {...card('unfinished_business_workbook', {
               badge: 'Workbook',
               bestFor: 'People working with shadow, projection, resistance, anger, and boundaries.',
-              problem: 'Guided workbook for understanding and integrating hidden protective strategies.',
+              problem: 'Explore the hidden needs, fears, projections, and protective patterns beneath repeated reactions so you can understand yourself more clearly.',
               ctaLabel: 'Buy Workbook',
             })}
           />
@@ -330,7 +331,7 @@ export default async function PowerToolsPage() {
             {...card('raising_awareness_workbook', {
               badge: 'Workbook',
               bestFor: 'People who want to expand perspective, maturity, and compassion.',
-              problem: 'Guided workbook for development, perspective-taking, and higher-good practice.',
+              problem: 'Widen your perspective, increase maturity, and practice responding from a larger view with greater wisdom and care.',
               ctaLabel: 'Buy Workbook',
             })}
           />
