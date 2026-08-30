@@ -11,9 +11,16 @@ export function LaunchTeamForm() {
   const [state, setState] = useState<'idle' | 'sending' | 'done' | 'error'>('idle');
   const [error, setError] = useState('');
 
+  /**
+   * The button stays disabled until there is a name and a plausible email, so
+   * the form cannot be submitted empty. `required` alone only complains after
+   * a click; this makes it visible that something is still needed.
+   */
+  const ready = firstName.trim().length > 0 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (state === 'sending') return;
+    if (state === 'sending' || !ready) return;
     setState('sending');
     setError('');
     try {
@@ -29,6 +36,10 @@ export function LaunchTeamForm() {
         return;
       }
       setState('done');
+      // The confirmation replaces the form in place, which on a long page can
+      // leave someone staring at the middle of it. Bring them back to the top
+      // so the thank-you is the thing they see.
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch {
       setState('error');
       setError('Could not reach the server. Please check your connection and try again.');
@@ -115,12 +126,25 @@ export function LaunchTeamForm() {
 
       <button
         type="submit"
-        disabled={state === 'sending'}
+        disabled={state === 'sending' || !ready}
         className="btn-primary"
-        style={{ width: '100%', padding: '0.9375rem 1.5rem', border: 'none', fontSize: '1rem', cursor: state === 'sending' ? 'wait' : 'pointer', opacity: state === 'sending' ? 0.7 : 1 }}
+        style={{
+          width: '100%',
+          padding: '0.9375rem 1.5rem',
+          border: 'none',
+          fontSize: '1rem',
+          cursor: state === 'sending' ? 'wait' : ready ? 'pointer' : 'not-allowed',
+          opacity: state === 'sending' || !ready ? 0.55 : 1,
+          transition: 'opacity 0.15s',
+        }}
       >
         {state === 'sending' ? 'Joining…' : 'Join the Launch Team'}
       </button>
+      {!ready && (
+        <p style={{ marginTop: '0.6rem', marginBottom: 0, fontSize: '0.8125rem', color: 'var(--color-brand-text-light)', textAlign: 'center' }}>
+          Add your first name and email to join.
+        </p>
+      )}
 
       {state === 'error' && (
         <p role="alert" style={{ marginTop: '1rem', fontSize: '0.875rem', color: '#b3261e' }}>{error}</p>

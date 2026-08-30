@@ -12,8 +12,11 @@ const columns = [
     heading: 'The Book',
     links: [
       { name: 'Built This Way',           href: '/power-tools/book'             },
-      { name: 'Launch Team',              href: '/power-tools/book'             },
-      { name: 'Why Did I React That Way?', href: 'https://why-did-i-react.vercel.app/', external: true },
+      // Was pointing at the book page, so the one link in the footer actually
+      // labelled "Launch Team" never reached the signup. Every Launch Team link
+      // on the site now lands on /launch-team.
+      { name: 'Launch Team',              href: '/launch-team#join'             },
+      { name: 'Why Did I React That Way?', href: 'https://www.whydidireactthatway.com/?utm_source=drmarkpirtle&utm_medium=footer', external: true },
     ],
   },
   {

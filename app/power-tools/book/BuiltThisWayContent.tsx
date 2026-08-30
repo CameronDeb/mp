@@ -23,9 +23,12 @@ const LEARNS = [
    their Stripe Payment Links are gone; recover them
    from git if fundraising ever returns.
 
-   The hero scrolls to the launch team pitch, whose own
-   CTA goes to /launch-team — the opt-in page built
-   from Mark's BTWLaunchTeamWebpageCopy doc.
+   Every launch team CTA on this page goes straight to
+   the form at /launch-team#join. They used to chain:
+   the hero scrolled down this page, that section's
+   button went to /launch-team, and that page's hero
+   scrolled again — three clicks to reach an email
+   field, which is the repetition Mark flagged.
 ───────────────────────────────────────────── */
 export default function BuiltThisWayContent() {
   return (
@@ -124,7 +127,7 @@ export default function BuiltThisWayContent() {
 
           {/* CTA */}
           <a
-            href="#launch-team"
+            href="/launch-team#join"
             className="btn-primary"
             style={{ fontSize: '1rem', padding: '1rem 2.5rem' }}
           >
@@ -327,7 +330,7 @@ export default function BuiltThisWayContent() {
             bringing its ideas into your daily life.
           </p>
 
-          <Link href="/launch-team" className="btn-primary" style={{ fontSize: '1rem', padding: '1rem 2.5rem' }}>
+          <Link href="/launch-team#join" className="btn-primary" style={{ fontSize: '1rem', padding: '1rem 2.5rem' }}>
             Join the Launch Team <ArrowRight className="inline w-4 h-4 ml-1" />
           </Link>
         </div>
@@ -426,7 +429,7 @@ export default function BuiltThisWayContent() {
             ))}
           </div>
 
-          <Link href="/launch-team" className="btn-primary" style={{ fontSize: '1rem', padding: '1rem 2.75rem' }}>
+          <Link href="/launch-team#join" className="btn-primary" style={{ fontSize: '1rem', padding: '1rem 2.75rem' }}>
             Join the Launch Team
           </Link>
         </div>
