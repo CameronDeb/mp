@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import { CheckCircle, Target, Compass, Zap, RefreshCw, Activity, FileText } from 'lucide-react';
 import { getPageBySlug, buildMetadata } from '@/lib/pages';
 import BlockRenderer from '@/components/blocks/BlockRenderer';
@@ -156,6 +157,26 @@ export default async function ConsultationPage() {
         className="section relative overflow-hidden"
         style={{ backgroundColor: 'var(--color-brand-navy)', paddingTop: '8rem', paddingBottom: '6rem' }}
       >
+        {/* Mark teaching the material this page is selling. The page was a
+            long stretch of type with nothing to look at, and a leadership
+            assessment is easier to trust when you can see who is behind it.
+            Sits under the existing rust glow, weighted low so the headline
+            keeps its contrast. */}
+        <Image
+          src="/images/mark/saaq-coaching.webp"
+          alt="Dr. Mark Pirtle teaching a leadership session"
+          fill
+          priority
+          sizes="100vw"
+          style={{ objectFit: 'cover', objectPosition: '70% center', opacity: 0.22 }}
+        />
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              'linear-gradient(90deg, var(--color-brand-navy) 0%, rgba(41,54,67,0.92) 45%, rgba(41,54,67,0.62) 100%)',
+          }}
+        />
         <div
           className="absolute inset-0 pointer-events-none"
           style={{

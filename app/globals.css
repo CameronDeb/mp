@@ -159,6 +159,12 @@ p {
   max-width: 68ch;
 }
 
+/* A hero photo alongside the headline needs room to be worth showing. Below
+   900px there isn't any, so it comes out rather than squeezing the type. */
+@media (max-width: 900px) {
+  .hero-block-photo { display: none; }
+}
+
 /* ── Header ───────────────────────────────────────────────────────────────
    The nav needed 1372px to lay out, so on any 1280 or 1366 laptop the items
    collided with the logo and wrapped onto two lines. Most of that was 216px of

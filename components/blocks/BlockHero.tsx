@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import type { BlockHeroData } from '@/lib/pages';
 
 const bgMap: Record<string, string> = {
@@ -41,6 +42,53 @@ export default function BlockHero({ block }: { block: BlockHeroData }) {
       className="section relative overflow-hidden"
       style={{ backgroundColor: bg, paddingTop: '8rem', paddingBottom: '6rem' }}
     >
+      {/* Optional photo behind the hero, set per page in the CMS. The scrim is
+          applied here rather than left to whoever picks the image, so a hero
+          can never end up with unreadable text — and it means Mark can swap
+          the photo himself without needing anyone to check contrast. */}
+      {block.background_image && (
+        <>
+          {/* Dark heroes take the photo full-bleed and dimmed, since white type
+              sits on top of it. Light heroes instead show it at full strength
+              on the right and fade it out before the text: a washed-out image
+              behind dark type would be neither readable nor worth looking at.
+              Hidden below 900px, where there is no room beside the headline. */}
+          <div
+            className="hidden lg:block absolute inset-y-0 pointer-events-none"
+            style={
+              onDark
+                ? { left: 0, right: 0 }
+                : { right: 0, width: '58%', left: 'auto' }
+            }
+          >
+            <Image
+              src={block.background_image}
+              alt=""
+              fill
+              priority
+              sizes={onDark ? '100vw' : '58vw'}
+              style={{ objectFit: 'cover', objectPosition: 'center', opacity: onDark ? 0.32 : 1 }}
+            />
+            {!onDark && (
+              <div
+                className="absolute inset-0"
+                style={{
+                  background: `linear-gradient(90deg, ${bg} 0%, ${bg} 12%, rgba(255,255,255,0) 78%)`,
+                }}
+              />
+            )}
+          </div>
+          {onDark && (
+            <div
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                background:
+                  'linear-gradient(90deg, var(--color-brand-navy) 0%, rgba(41,54,67,0.9) 50%, rgba(41,54,67,0.55) 100%)',
+              }}
+            />
+          )}
+        </>
+      )}
       {onDark && (
         <div
           className="absolute inset-0 pointer-events-none"

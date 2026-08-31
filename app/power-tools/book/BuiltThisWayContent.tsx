@@ -224,7 +224,7 @@ export default function BuiltThisWayContent() {
             marginBottom: '1.5rem',
             lineHeight: 1.2,
           }}>
-            You are not broken.<br />
+            There&rsquo;s nothing wrong with you.<br />
             You are built around patterns.<br />
             <span style={{ color: 'var(--color-brand-sienna)' }}>And patterns can change.</span>
           </h2>

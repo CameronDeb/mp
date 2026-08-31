@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useState } from 'react';
 import { ArrowRight, Check, Plus, Minus, Users, Clock, MapPin } from 'lucide-react';
 import { ForumRetreatInquirySection } from '@/components/forum-retreats/ForumRetreatInquirySection';
@@ -151,13 +152,31 @@ export default function ForumRetreatsContent() {
   return (
     <div style={{ backgroundColor: 'var(--color-brand-cream)' }}>
 
-      {/* ── HERO ── */}
+      {/* ── HERO ──
+          A photograph of Mark actually facilitating a group sits behind the
+          gradient. The page was a wall of text about a room nobody could
+          picture; this shows the room. The scrim is heavy enough that the
+          headline keeps its contrast rather than competing with the image. */}
       <section style={{
-        background: 'linear-gradient(135deg, #1a1a1a 0%, #2d2020 50%, #1a1a1a 100%)',
+        position: 'relative',
         minHeight: '85vh', display: 'flex', alignItems: 'center',
         padding: '8rem 1.5rem 6rem',
+        overflow: 'hidden',
       }}>
-        <div className="container" style={{ maxWidth: 820 }}>
+        <Image
+          src="/images/mark/forum-retreats.webp"
+          alt="Dr. Mark Pirtle facilitating a forum retreat session"
+          fill
+          priority
+          sizes="100vw"
+          style={{ objectFit: 'cover', objectPosition: '60% center' }}
+        />
+        <div style={{
+          position: 'absolute', inset: 0,
+          background:
+            'linear-gradient(135deg, rgba(20,20,20,0.93) 0%, rgba(45,32,32,0.86) 45%, rgba(20,20,20,0.78) 100%)',
+        }} />
+        <div className="container" style={{ maxWidth: 820, position: 'relative' }}>
           <p style={{
             fontSize: 'var(--text-xs)', fontWeight: 600, letterSpacing: '0.14em',
             textTransform: 'uppercase', color: 'var(--color-brand-sienna)', marginBottom: '1.5rem',

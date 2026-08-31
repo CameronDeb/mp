@@ -16,6 +16,8 @@ export type BlockHeroData = {
   cta_secondary_url?: string;
   background?: 'navy' | 'cream' | 'white';
   quick_facts?: QuickFact[];
+  /** Optional photo behind the hero. Resolved to a full asset URL on fetch. */
+  background_image?: string | null;
 };
 
 export type BlockRichtextData = {
@@ -241,6 +243,16 @@ export async function getPageBySlug(slug: string): Promise<PageData | null> {
     const json = await res.json();
     const page = json?.data?.[0];
     if (!page) return null;
+
+    // Directus returns a file field as a bare uuid. Components need a URL, and
+    // resolving it here means every block gets the same treatment rather than
+    // each one remembering to build the path itself.
+    for (const block of page.blocks ?? []) {
+      const img = block?.item?.background_image;
+      if (typeof img === 'string' && img && !img.startsWith('http')) {
+        block.item.background_image = `${base}/assets/${img}`;
+      }
+    }
     return page as PageData;
   } catch {
     return null;
