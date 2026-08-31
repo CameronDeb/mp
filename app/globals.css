@@ -159,6 +159,28 @@ p {
   max-width: 68ch;
 }
 
+/* ── Header ───────────────────────────────────────────────────────────────
+   The nav needed 1372px to lay out, so on any 1280 or 1366 laptop the items
+   collided with the logo and wrapped onto two lines. Most of that was 216px of
+   horizontal padding plus a 2rem gap between seven items.
+
+   Padding and gap tighten between 1024px and 1400px so everything fits on a
+   normal laptop, and labels never wrap: a nav item on two lines reads as a
+   layout fault rather than a design. */
+.site-header-inner { padding: 0 clamp(1.5rem, 7.5vw, 6.75rem); }
+.site-nav { gap: 2rem; }
+.site-nav a { white-space: nowrap; }
+
+@media (max-width: 1400px) {
+  .site-header-inner { padding: 0 2.25rem; }
+  .site-nav { gap: 1.5rem; }
+}
+
+@media (max-width: 1200px) {
+  .site-header-inner { padding: 0 1.5rem; }
+  .site-nav { gap: 1.15rem; }
+}
+
 /* ── Mobile homepage ──────────────────────────────────────────────────────
    Mark's brief: one responsive site, desktop untouched, but the phone version
    should be "calm, clear and guided" rather than the whole ecosystem at once.

@@ -106,10 +106,13 @@ export function Header({
         borderBottom: pastHero ? '1px solid rgba(0,0,0,0.07)' : 'none',
         transition: 'background-color 0.35s ease',
       }}>
-        <div style={{
+        {/* Padding and nav gap tighten below 1400px — see .site-header-inner
+            in globals.css. The header needed 1372px to lay out, so on a 1280
+            or 1366 laptop the nav collided with the logo and wrapped. */}
+        <div className="site-header-inner" style={{
           margin: '0 auto',
-          padding: '0 clamp(1.5rem, 7.5vw, 6.75rem)',
           height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          gap: '1.5rem',
         }}>
 
           {/* Logo — natural colour; header is light on every page */}
@@ -131,7 +134,7 @@ export function Header({
           </Link>
 
           {/* Desktop nav */}
-          <nav className="hidden lg:flex items-center" style={{ gap: '2rem' }}>
+          <nav className="hidden xl:flex items-center site-nav">
             {navigation.map(item => (
               <div
                 key={item.name}
@@ -190,7 +193,7 @@ export function Header({
           </nav>
 
           {/* Right: Search + Start Here */}
-          <div className="hidden lg:flex items-center" style={{ gap: '1.25rem' }}>
+          <div className="hidden xl:flex items-center" style={{ gap: '1.25rem' }}>
             <button onClick={() => setSearchOpen(o => !o)} aria-label="Search"
               style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0.4rem', color: linkColor, transition: 'color 0.15s' }}
               onMouseEnter={e => (e.currentTarget.style.color = linkHover)}
@@ -220,7 +223,7 @@ export function Header({
           </div>
 
           {/* Mobile burger */}
-          <button onClick={() => setMobileOpen(o => !o)} className="lg:hidden"
+          <button onClick={() => setMobileOpen(o => !o)} className="xl:hidden"
             style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#000', padding: '0.5rem', transition: 'color 0.3s' }}>
             {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
@@ -240,7 +243,7 @@ export function Header({
 
       {/* Mobile menu */}
       {mobileOpen && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 40 }} className="lg:hidden">
+        <div style={{ position: 'fixed', inset: 0, zIndex: 40 }} className="xl:hidden">
           <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.4)' }} onClick={() => setMobileOpen(false)} />
           <div style={{
             position: 'fixed', top: '6.25rem', left: 0, right: 0, bottom: 0,
