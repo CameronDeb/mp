@@ -12,6 +12,23 @@ const API_SECRET = process.env.NEWSLETTER_API_SECRET;
 // cursor was written — the one failure mode that causes duplicate sends.
 export const maxDuration = 300;
 
+// `mailgun_message_id` is varchar(500) and a chunked send produces one id per
+// call at roughly 55 chars each, so it overflows after about nine calls. The
+// PATCH that overflows it fails *after* the emails have been accepted, which
+// loses the cursor and queues those people for a second copy. Keep the most
+// recent ids that fit rather than letting the column decide.
+const MESSAGE_ID_MAX = 500;
+
+function fitMessageIds(ids: string[]): string {
+  let out = '';
+  for (let i = ids.length - 1; i >= 0; i--) {
+    const next = out ? `${ids[i]}, ${out}` : ids[i];
+    if (next.length > MESSAGE_ID_MAX) break;
+    out = next;
+  }
+  return out;
+}
+
 export async function POST(request: NextRequest) {
   // Simple secret check so random requests can't trigger sends
   const auth = request.headers.get('x-api-secret');
@@ -149,19 +166,46 @@ export async function POST(request: NextRequest) {
   const priorCount = isContinuation ? Number(newsletterItem.recipient_count ?? 0) : 0;
   const priorIds = isContinuation ? String(newsletterItem.mailgun_message_id ?? '').trim() : '';
 
-  const patchStatusRes = await fetch(`${DIRECTUS_URL}/items/newsletters/${newsletterId}`, {
-    method: 'PATCH',
-    headers: authHeaders,
-    body: JSON.stringify({
-      status: complete ? 'sent' : 'sending',
-      send_date: new Date().toISOString(),
-      recipient_count: priorCount + sendResult.recipientCount,
-      mailgun_message_id: [priorIds, ...sendResult.messageIds].filter(Boolean).join(', '),
-    }),
+  const progress = {
+    status: complete ? 'sent' : 'sending',
+    send_date: new Date().toISOString(),
+    recipient_count: priorCount + sendResult.recipientCount,
+  };
+
+  const patchStatus = (body: Record<string, unknown>) =>
+    fetch(`${DIRECTUS_URL}/items/newsletters/${newsletterId}`, {
+      method: 'PATCH',
+      headers: authHeaders,
+      body: JSON.stringify(body),
+    });
+
+  let patchStatusRes = await patchStatus({
+    ...progress,
+    mailgun_message_id: fitMessageIds([
+      ...priorIds.split(',').map((s) => s.trim()).filter(Boolean),
+      ...sendResult.messageIds,
+    ]),
   });
+
+  // The recipient count is the cursor. If anything about the message-id column
+  // rejects the write, saving the count still matters far more than keeping the
+  // ids, so drop them and retry rather than lose the record of a send that has
+  // already left.
+  if (!patchStatusRes.ok) {
+    patchStatusRes = await patchStatus(progress);
+  }
+
   if (!patchStatusRes.ok) {
     return NextResponse.json(
-      { error: `Sent successfully but failed to update newsletter status: ${await patchStatusRes.text()}`, sendResult },
+      {
+        error:
+          `Sent to ${sendResult.recipientCount} recipient(s) but could not record it: ` +
+          `${await patchStatusRes.text()} — do NOT resume from the old cursor. ` +
+          `Set recipient_count to ${progress.recipient_count} and resume from after_id ${sendResult.lastId}.`,
+        sendResult,
+        recoverAfterId: sendResult.lastId,
+        recoverRecipientCount: progress.recipient_count,
+      },
       { status: 500 }
     );
   }
