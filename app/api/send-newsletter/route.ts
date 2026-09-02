@@ -6,6 +6,12 @@ const DIRECTUS_URL = process.env.NEXT_PUBLIC_DIRECTUS_URL || 'http://localhost:8
 const DIRECTUS_TOKEN = process.env.DIRECTUS_STATIC_TOKEN;
 const API_SECRET = process.env.NEWSLETTER_API_SECRET;
 
+// A cohort is split into several Mailgun calls (see MAILGUN_MAX_RECIPIENTS_PER_CALL),
+// so a send takes seconds rather than milliseconds. The default serverless timeout
+// would cut it off mid-sequence, after some people were mailed but before the
+// cursor was written — the one failure mode that causes duplicate sends.
+export const maxDuration = 300;
+
 export async function POST(request: NextRequest) {
   // Simple secret check so random requests can't trigger sends
   const auth = request.headers.get('x-api-secret');
@@ -136,7 +142,9 @@ export async function POST(request: NextRequest) {
   // recipient_count accumulates across batches rather than being overwritten.
   // afterId 0 means this is the first cohort, so prior totals are from an older
   // send and must not be carried forward.
-  const complete = sendResult.remaining === 0;
+  // A cohort that stopped early is never "sent", even if the cursor happens to
+  // have reached the end of the list.
+  const complete = sendResult.remaining === 0 && !sendResult.error;
   const isContinuation = afterId > 0;
   const priorCount = isContinuation ? Number(newsletterItem.recipient_count ?? 0) : 0;
   const priorIds = isContinuation ? String(newsletterItem.mailgun_message_id ?? '').trim() : '';
@@ -159,7 +167,10 @@ export async function POST(request: NextRequest) {
   }
 
   return NextResponse.json({
-    ok: true,
+    // `ok: false` with a recipientCount above zero is the partial case: some
+    // people were mailed and the cursor has been saved, so resuming from
+    // nextAfterId continues rather than repeats.
+    ok: !sendResult.error,
     ...sendResult,
     complete,
     // Hand the operator the exact cursor for the next warm-up cohort so no one

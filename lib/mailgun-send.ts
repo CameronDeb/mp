@@ -13,8 +13,18 @@ const MAILGUN_FROM = process.env.MAILGUN_FROM || 'Dr. Mark Pirtle <newsletter@mg
 // makes it an address nobody monitors. Replies are redirected to a real inbox.
 const NEWSLETTER_REPLY_TO = process.env.NEWSLETTER_REPLY_TO;
 
-// Mailgun's per-call recipient cap for a single batch send.
-const MAILGUN_CALL_CAP = 1000;
+// Mailgun's own per-call cap is 1000, but a domain with little sending history
+// is refused above a much smaller number: mg.drmarkpirtle.com currently rejects
+// anything over 5 with "not allowed to send large batches yet". So the cohort is
+// split into calls of this size and sent as a sequence.
+//
+// Raise this to 1000 once Mailgun lifts the restriction — at 5 a full send to
+// the list is ~317 calls, which is slow and pointless once it is unnecessary.
+const MAILGUN_CALL_CAP = Number(process.env.MAILGUN_MAX_RECIPIENTS_PER_CALL || 5);
+
+// A short pause between calls. Firing hundreds of requests back to back at a
+// domain that is already rate-limited is how a warm-up turns into a block.
+const MAILGUN_CALL_DELAY_MS = Number(process.env.MAILGUN_CALL_DELAY_MS || 600);
 
 interface Subscriber {
   id: number;
@@ -91,6 +101,14 @@ export interface SendResult {
   dryRun?: boolean;
   /** Present on a dry run so the operator can eyeball who is about to be mailed. */
   preview?: string[];
+  /** How many Mailgun calls the cohort was split across. */
+  callsMade?: number;
+  /**
+   * Set when the sequence stopped early. `recipientCount` and `lastId` then
+   * describe what actually went out, not what was intended — the caller must
+   * still record them, or the people already mailed get a second copy.
+   */
+  error?: string;
 }
 
 /**
@@ -128,8 +146,18 @@ export async function sendNewsletterToSubscribers(
   }
 
   const messageIds: string[] = [];
+  // Tracked as the sequence goes so a failure halfway through still reports
+  // exactly how far it got. Sending is not transactional: once a call is
+  // accepted those people have been mailed, and throwing that away would make
+  // the next run start from a cursor that has already been passed.
+  let sent = 0;
+  let lastSentId = afterId;
+  let failure: string | undefined;
 
-  for (const batch of chunk(recipients, MAILGUN_CALL_CAP)) {
+  const batches = chunk(recipients, MAILGUN_CALL_CAP);
+
+  for (let i = 0; i < batches.length; i++) {
+    const batch = batches[i];
     const to = batch.map((r) => (r.name ? `${r.name} <${r.email}>` : r.email)).join(',');
     const recipientVariables: Record<string, { name: string }> = {};
     for (const r of batch) {
@@ -150,24 +178,44 @@ export async function sendNewsletterToSubscribers(
     form.append('h:List-Unsubscribe', '<%unsubscribe_url%>');
     form.append('h:List-Unsubscribe-Post', 'List-Unsubscribe=One-Click');
 
-    const res = await fetch(`https://api.mailgun.net/v3/${MAILGUN_DOMAIN}/messages`, {
-      method: 'POST',
-      headers: { Authorization: `Basic ${Buffer.from(`api:${MAILGUN_API_KEY}`).toString('base64')}` },
-      body: form,
-    });
-
-    if (!res.ok) {
-      throw new Error(`Mailgun send failed (${res.status}): ${await res.text()}`);
+    try {
+      const res = await fetch(`https://api.mailgun.net/v3/${MAILGUN_DOMAIN}/messages`, {
+        method: 'POST',
+        headers: { Authorization: `Basic ${Buffer.from(`api:${MAILGUN_API_KEY}`).toString('base64')}` },
+        body: form,
+      });
+      if (!res.ok) {
+        throw new Error(`Mailgun send failed (${res.status}): ${await res.text()}`);
+      }
+      const json = await res.json();
+      messageIds.push(json.id);
+      sent += batch.length;
+      lastSentId = batch[batch.length - 1].id;
+    } catch (err) {
+      // Stop rather than push on. Whatever caused this — rate limit, a batch
+      // cap, a suspension — will almost certainly reject the next call too, and
+      // each further attempt only widens the gap between sent and recorded.
+      failure = err instanceof Error ? err.message : String(err);
+      break;
     }
-    const json = await res.json();
-    messageIds.push(json.id);
+
+    if (i < batches.length - 1 && MAILGUN_CALL_DELAY_MS > 0) {
+      await new Promise((resolve) => setTimeout(resolve, MAILGUN_CALL_DELAY_MS));
+    }
   }
 
+  // Nothing got out, so there is no progress worth recording and the caller
+  // should treat it as a plain failure, exactly as it did when this was a
+  // single all-or-nothing call.
+  if (sent === 0 && failure) throw new Error(failure);
+
   return {
-    recipientCount: recipients.length,
+    recipientCount: sent,
     messageIds,
-    lastId,
-    remaining: await countRemaining(lastId),
+    lastId: lastSentId,
+    remaining: await countRemaining(lastSentId),
+    callsMade: messageIds.length,
+    ...(failure ? { error: failure } : {}),
   };
 }
 
