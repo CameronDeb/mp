@@ -38,7 +38,7 @@ export default function LegalPage({
             Last updated {updated}
           </p>
           <div
-            className="prose"
+            className="legal-prose"
             style={{ color: 'var(--color-brand-text-muted)', lineHeight: 1.75 }}
           >
             {children}

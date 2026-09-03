@@ -159,6 +159,35 @@ p {
   max-width: 68ch;
 }
 
+/* Long-form legal copy (privacy, terms, disclaimer).
+   Tailwind's preflight strips margins from p and headings, and this project has
+   no typography plugin, so `.prose` is not a real class and styles nothing. Page
+   components normally supply their own spacing per section, but a legal page is
+   one continuous run of prose, so it needs its own rhythm or every heading sits
+   flush against the paragraph above it. h2 is also stepped down from the hero
+   size, which is far too loud for a subsection heading in a document. */
+.legal-prose h2 {
+  font-size: var(--text-title);
+  color: var(--color-brand-text);
+  margin: 2.75rem 0 0.75rem;
+}
+.legal-prose h2:first-child { margin-top: 0; }
+.legal-prose p { margin-bottom: 1.1rem; }
+.legal-prose ul {
+  list-style: disc;
+  margin: 0 0 1.4rem 1.25rem;
+}
+.legal-prose li {
+  color: var(--color-brand-text-muted);
+  margin-bottom: 0.5rem;
+}
+.legal-prose strong { color: var(--color-brand-text); font-weight: 600; }
+.legal-prose a {
+  color: var(--color-brand-sienna);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 /* A hero photo alongside the headline needs room to be worth showing. Below
    900px there isn't any, so it comes out rather than squeezing the type. */
 @media (max-width: 900px) {
