@@ -16,13 +16,25 @@ const NEWSLETTER_REPLY_TO = process.env.NEWSLETTER_REPLY_TO;
 // Mailgun's per-call recipient cap. A cohort larger than this is split across
 // several calls sent in sequence.
 //
-// This was temporarily 5: the account had been placed on an evaluation period by
-// Mailgun's reputation monitoring (a new domain whose first act was mailing an
-// imported list), which capped messages at 9 recipients and 100 per hour.
-// Mailgun Compliance cleared the account on 2 September 2026 and removed both
-// limits, verified by test-mode probe at 250 recipients, so it is back to their
-// documented maximum. Lower it via the env var if a limit is ever reimposed.
-const MAILGUN_CALL_CAP = Number(process.env.MAILGUN_MAX_RECIPIENTS_PER_CALL || 1000);
+// Kept well below Mailgun's documented 1000 because of what happened on
+// 3 September 2026. A single call with 250 recipients returned 200 OK with a
+// message id, and then delivered to exactly one of them: the last address in
+// the batch. No error, no failure event, nothing in the logs for the other 249.
+// The send was recorded as successful and the cursor moved past all 250, which
+// would have skipped those people permanently had it not been checked against
+// Mailgun's own event data afterwards.
+//
+// A call with 150 recipients had worked correctly an hour earlier, so the real
+// ceiling sits somewhere between the two and is not reported as an error. A
+// test-mode probe at 250 was accepted and fanned out normally, so test mode
+// does not exercise whatever limit this is — it cannot be used to justify
+// raising this number.
+//
+// 100 is under the largest size proven to work in a real send. Do not raise it
+// without sending a real batch at the new size and then confirming the accepted
+// count in Mailgun's events API actually matches. The API response alone does
+// not tell you the mail went out.
+const MAILGUN_CALL_CAP = Number(process.env.MAILGUN_MAX_RECIPIENTS_PER_CALL || 100);
 
 // A short pause between calls. Firing hundreds of requests back to back at a
 // domain that is already rate-limited is how a warm-up turns into a block.
