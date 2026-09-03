@@ -13,14 +13,16 @@ const MAILGUN_FROM = process.env.MAILGUN_FROM || 'Dr. Mark Pirtle <newsletter@mg
 // makes it an address nobody monitors. Replies are redirected to a real inbox.
 const NEWSLETTER_REPLY_TO = process.env.NEWSLETTER_REPLY_TO;
 
-// Mailgun's own per-call cap is 1000, but a domain with little sending history
-// is refused above a much smaller number: mg.drmarkpirtle.com currently rejects
-// anything over 5 with "not allowed to send large batches yet". So the cohort is
-// split into calls of this size and sent as a sequence.
+// Mailgun's per-call recipient cap. A cohort larger than this is split across
+// several calls sent in sequence.
 //
-// Raise this to 1000 once Mailgun lifts the restriction — at 5 a full send to
-// the list is ~317 calls, which is slow and pointless once it is unnecessary.
-const MAILGUN_CALL_CAP = Number(process.env.MAILGUN_MAX_RECIPIENTS_PER_CALL || 5);
+// This was temporarily 5: the account had been placed on an evaluation period by
+// Mailgun's reputation monitoring (a new domain whose first act was mailing an
+// imported list), which capped messages at 9 recipients and 100 per hour.
+// Mailgun Compliance cleared the account on 2 September 2026 and removed both
+// limits, verified by test-mode probe at 250 recipients, so it is back to their
+// documented maximum. Lower it via the env var if a limit is ever reimposed.
+const MAILGUN_CALL_CAP = Number(process.env.MAILGUN_MAX_RECIPIENTS_PER_CALL || 1000);
 
 // A short pause between calls. Firing hundreds of requests back to back at a
 // domain that is already rate-limited is how a warm-up turns into a block.
