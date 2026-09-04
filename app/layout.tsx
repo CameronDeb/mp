@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { Analytics } from "@vercel/analytics/next";
 import { getSiteMedia, getSiteCopy, getBookCta } from "@/lib/site-settings";
 import { getCuratedCategories } from "@/lib/blog";
 
@@ -58,6 +59,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           newsletterButtonLabel={copy.newsletterButtonLabel}
           newsletterPrivacyLine={copy.newsletterPrivacyLine}
         />
+        {/* Page-view counts only. No cookies, no cross-site tracking and no
+            advertising profile, which is what lets the privacy policy keep
+            saying visitors are not tracked around the web. If this is ever
+            swapped for something that does profile people, /privacy has to
+            change in the same commit. */}
+        <Analytics />
       </body>
     </html>
   );

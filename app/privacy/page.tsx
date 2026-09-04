@@ -62,10 +62,19 @@ export default function PrivacyPolicy() {
         produce your result and then discarded.
       </p>
 
+      <h2>Visitor numbers</h2>
+      <p>
+        This site counts page views using Vercel Analytics, so it is possible to see which
+        pages people find useful. It records the page visited and rough details like country
+        and device type. It does not use cookies, does not follow you to other websites, and
+        does not build a profile of you. The counts are not linked to your name or email
+        address, and are not used for advertising.
+      </p>
+
       <h2>What is not done</h2>
       <ul>
-        <li>No analytics or advertising trackers run on this site.</li>
-        <li>No tracking cookies are set, and no profile of your browsing is built.</li>
+        <li>No advertising trackers or advertising cookies run on this site.</li>
+        <li>No profile of your browsing is built, and you are not followed across the web.</li>
         <li>Your information is never sold, rented, or traded.</li>
         <li>Your details are never passed to anyone else for their own marketing.</li>
       </ul>
