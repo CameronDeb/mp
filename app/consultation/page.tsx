@@ -149,6 +149,18 @@ export default async function ConsultationPage() {
     );
   }
 
+  /**
+   * ⚠️  EVERYTHING BELOW IS THE FALLBACK, NOT THE LIVE PAGE.
+   *
+   * /consultation is built from CMS blocks in Directus, which is what the
+   * return above renders. This runs only when that lookup comes back empty —
+   * a CMS outage, or the page being unpublished. Directus has already returned
+   * 503 during a build, so this is worth keeping rather than deleting as dead
+   * code.
+   *
+   * Editing it will not change the live site. To change what visitors see,
+   * edit the "SAAQ / Consultation" page in Directus.
+   */
   return (
     <main className="min-h-screen" style={{ backgroundColor: 'var(--color-bg)' }}>
 

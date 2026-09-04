@@ -1,5 +1,18 @@
 'use client';
 
+/**
+ * ⚠️  THIS IS NOT THE LIVE FORUM RETREATS PAGE.
+ *
+ * /forum-retreats is built from CMS blocks in Directus. This file renders only
+ * when that lookup returns nothing — a CMS outage, or the page being
+ * unpublished. Directus runs on a droplet that has already returned 503 during
+ * a build, so this fallback earns its place; do not delete it as dead code.
+ *
+ * But editing it will not change the live site. To change what visitors see,
+ * edit the "Forum Retreats" page in Directus. Keep this roughly in step with
+ * the CMS copy so an outage does not serve something badly out of date.
+ */
+
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState } from 'react';
