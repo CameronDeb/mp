@@ -41,11 +41,13 @@ export async function POST(request: NextRequest) {
   let batchSize: number | undefined;
   let afterId = 0;
   let dryRun = false;
+  let force = false;
   try {
     const body = await request.json();
     newsletterId = Number(body.newsletter_id);
     if (!newsletterId || isNaN(newsletterId)) throw new Error('invalid id');
     if (body.test_email) testEmail = String(body.test_email);
+    force = Boolean(body.force);
     if (body.batch_size != null) {
       batchSize = Number(body.batch_size);
       if (!Number.isFinite(batchSize) || batchSize < 1) throw new Error('invalid batch_size');
@@ -80,7 +82,7 @@ export async function POST(request: NextRequest) {
     ...(DIRECTUS_TOKEN ? { Authorization: `Bearer ${DIRECTUS_TOKEN}` } : {}),
   };
 
-  const itemRes = await fetch(`${DIRECTUS_URL}/items/newsletters/${newsletterId}?fields=subject,recipient_count,mailgun_message_id`, {
+  const itemRes = await fetch(`${DIRECTUS_URL}/items/newsletters/${newsletterId}?fields=subject,status,recipient_count,mailgun_message_id`, {
     headers: authHeaders,
   });
   if (!itemRes.ok) {
@@ -101,6 +103,25 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
     }
+  }
+
+  // A newsletter that has already gone out is not sent again by accident. This
+  // route is now reachable from a button in the CMS, so the caller may be
+  // someone who clicked twice, reopened an old issue, or came back to a tab
+  // from last week. Without this, a second click on a finished newsletter
+  // starts again from the top of the list and mails everybody a duplicate.
+  // `force` is the deliberate override for the rare genuine resend.
+  if (!dryRun && newsletterItem.status === 'sent' && !force) {
+    return NextResponse.json(
+      {
+        error:
+          `"${newsletterItem.subject}" has already been sent to ${newsletterItem.recipient_count ?? 'the list'} ` +
+          `subscribers. Nothing has been sent again. If you meant to send it a second time, ` +
+          `set its status back to Draft first.`,
+        alreadySent: true,
+      },
+      { status: 409 }
+    );
   }
 
   // Real send from here on. Refuse before anything is written or sent if the
