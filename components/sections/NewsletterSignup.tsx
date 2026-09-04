@@ -27,6 +27,8 @@ export function NewsletterSignup({
   privacyLine,
 }: NewsletterSignupProps) {
   const [email, setEmail] = useState('');
+  // Honeypot. Hidden from people, so anything in it came from a bot.
+  const [companyWebsite, setCompanyWebsite] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState(false);
 
@@ -43,7 +45,7 @@ export function NewsletterSignup({
       const res = await fetch('/api/newsletter/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, source_page: window.location.pathname }),
+        body: JSON.stringify({ email, source_page: window.location.pathname, company_website: companyWebsite }),
       });
       if (res.ok) setSubmitted(true);
       else setError(true);
@@ -103,6 +105,19 @@ export function NewsletterSignup({
             margin: '0 auto',
             flexWrap: 'wrap',
           }}>
+            {/* Hidden from people and from screen readers, and deliberately
+                given a name a bot will want to autofill. Left out of the tab
+                order so keyboard users never land on it. */}
+            <input
+              type="text"
+              name="company_website"
+              value={companyWebsite}
+              onChange={(e) => setCompanyWebsite(e.target.value)}
+              tabIndex={-1}
+              autoComplete="off"
+              aria-hidden="true"
+              style={{ position: 'absolute', left: '-9999px', width: '1px', height: '1px', opacity: 0 }}
+            />
             <input
               type="email"
               required

@@ -101,17 +101,34 @@ export async function POST(request: NextRequest) {
 
   let sourcePage = '';
 
+  // A field that is hidden in the form, so a person never sees it and never
+  // fills it in. Automated signups fill every input they find, which is how
+  // three Gmail dot-alias addresses reached the list in August and put a
+  // "new subscriber" email in Mark's inbox for each one.
+  let trap = '';
+
   if (contentType.includes('application/json')) {
     const body = await request.json().catch(() => ({}));
     email = String(body.email || '').trim();
     name = body.name ? String(body.name).trim() : null;
     sourcePage = body.source_page ? String(body.source_page).trim() : '';
+    trap = String(body.company_website || '').trim();
   } else {
     const form = await request.formData();
     email = String(form.get('email') || '').trim();
     name = form.get('name') ? String(form.get('name')).trim() : null;
     redirectTo = safeRedirectPath(form.get('redirect_to') ? String(form.get('redirect_to')) : null);
     sourcePage = redirectTo || '';
+    trap = String(form.get('company_website') || '').trim();
+  }
+
+  // Answered exactly as a successful signup would be. Telling a bot it was
+  // caught invites whoever runs it to adjust and try again, and there is no
+  // person on the other end to inform.
+  if (trap) {
+    console.warn('[newsletter] honeypot triggered, signup dropped');
+    if (redirectTo) return NextResponse.redirect(new URL(`${redirectTo}?subscribed=success`, request.url));
+    return NextResponse.json({ ok: true });
   }
 
   if (!EMAIL_RE.test(email)) {
