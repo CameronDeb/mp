@@ -112,13 +112,6 @@ export default function PrivacyPolicy() {
         Emails sent in response to something you did, such as a purchase receipt or a download
         link, are separate from the newsletter and are sent whether or not you subscribe.
       </p>
-      <p>
-        The newsletter records whether it was opened. This is done with a small invisible image,
-        which is the ordinary way email works, and it is used to see whether an issue was worth
-        sending rather than to study any individual. Links in the newsletter are not tracked, so
-        what you click is not recorded. If you would rather not be counted, most email programs
-        can block remote images, and doing so also stops this.
-      </p>
 
       <h2>How long information is kept</h2>
       <p>
